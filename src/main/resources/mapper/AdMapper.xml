@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jamie.home.api.dao.AdDao">
+    <sql id="List">
+        <if test="searchKeyword != null">
+            <if test="searchType == 'ad'.toString()">
+            </if>
+        </if>
+    </sql>
+    <sql id="ListOrder">
+        ORDER BY
+        <if test="orderType != null">
+            <choose>
+                <when test="orderType == 'reg_date_desc'.toString()">REGDATE DESC, </when>
+            </choose>
+        </if>
+        AD DESC
+    </sql>
+    <select id="getListAd" resultType="com.jamie.home.api.model.AD">
+        SELECT *
+        FROM BM_AD
+        WHERE 1=1
+        <include refid="List"></include>
+        <include refid="ListOrder"></include>
+        <if test="start != null">
+            LIMIT #{start}, #{page_block}
+        </if>
+    </select>
+
+    <select id="getListAdCnt" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM BM_AD
+        WHERE 1=1
+        <include refid="List"></include>
+    </select>
+
+    <select id="getAd" resultType="com.jamie.home.api.model.AD">
+        SELECT *
+        FROM BM_AD
+        WHERE AD = #{ad}
+    </select>
+
+    <insert id="insertAd" parameterType="com.jamie.home.api.model.AD" useGeneratedKeys="true" keyProperty="ad">
+        INSERT INTO BM_AD (
+            TITLE, CATEGORY, BRAND, NAME, PRICE, DISCOUNT, LINK, KEYWORDS, IMAGES, IMAGE_SUPPORT)
+        ) VALUES (
+            #{title}, #{category}, #{brand}, #{name}, #{price}, #{discount}, #{link}, #{keywords}, #{images}, #{image_support}
+        )
+    </insert>
+
+    <update id="updateAd">
+        UPDATE BM_AD SET UPDDATE = now()
+        <if test="title != null">,TITLE = #{title}</if>
+        <if test="category != null">,CATEGORY = #{category}</if>
+        <if test="brand != null">,BRAND = #{brand}</if>
+        <if test="name != null">,NAME = #{name}</if>
+        <if test="price != null">,PRICE = #{price}</if>
+        <if test="discount != null">,DISCOUNT = #{discount}</if>
+        <if test="link != null">,LINK = #{link}</if>
+        <if test="keywords != null">,KEYWORDS = #{keywords}</if>
+        <if test="images != null">,IMAGES = #{images}</if>
+        <if test="image_support != null">,IMAGE_SUPPORT = #{image_support}</if>
+        <if test="click_price != null">,CLICK_PRICE = #{click_price}</if>
+        <if test="day_price != null">,DAY_PRICE = #{day_price}</if>
+        <if test="show != null">,SHOW = #{show}</if>
+        <if test="state != null">,STATE = #{state}</if>
+        WHERE AD = #{ad}
+    </update>
+    <delete id="deleteAd">
+        DELETE FROM BM_AD WHERE AD = #{ad}
+    </delete>
+    <select id="getAdCommonKeyword" resultType="com.jamie.home.api.model.KEYWORD">
+        SELECT * FROM BM_AD_COMMON_KEYWORD WHERE AD = #{ad}
+    </select>
+    <insert id="insertAdCommonKeyword">
+        INSERT INTO BM_AD_COMMON_KEYWORD (AD, COMMON_KEYWORD) VALUES
+        <foreach collection="commonKeywordList" item="keyword" separator=",">
+            (#{ad}, #{keyword.common_keyword})
+        </foreach>
+    </insert>
+    <update id="updateAdCommonKeyword">
+        UPDATE BM_AD_COMMON_KEYWORD SET MANDATORY = #{mandatory} WHERE AD_COMMON_KEYWORD = #{ad_common_keyword}
+    </update>
+    <delete id="deleteAdCommonKeyword">
+        DELETE FROM BM_AD_COMMON_KEYWORD WHERE AD = #{ad} AND COMMON_KEYWORD = #{common_keyword}
+    </delete>
+    <select id="getAdKeyword" resultType="com.jamie.home.api.model.KEYWORD">
+        SELECT * FROM BM_AD_KEYWORD WHERE AD = #{ad}
+    </select>
+    <insert id="insertAdKeyword">
+        INSERT INTO BM_AD_KEYWORD (AD, KEYWORD) VALUES
+        <foreach collection="keywordList" item="keyword" separator=",">
+            (#{ad}, #{keyword.keyword})
+        </foreach>
+    </insert>
+    <update id="updateAdKeyword">
+        UPDATE BM_AD_KEYWORD SET MANDATORY = #{mandatory} WHERE AD_KEYWORD = #{ad_keyword}
+    </update>
+    <delete id="deleteAdKeyword">
+        DELETE FROM BM_AD_KEYWORD WHERE AD = #{ad} AND KEYWORD = #{keyword}
+    </delete>
+    <insert id="insertAdHit">
+        INSERT INTO BM_AD_HIT (AD, MEMBER) VALUES (#{ad}, #{member})
+    </insert>
+    <select id="getAdLike" resultType="java.lang.Integer">
+        SELECT count(*) FROM BM_AD_LIKE WHERE AD = #{ad} AND MEMBER = #{member}
+    </select>
+    <insert id="insertAdLike">
+        INSERT INTO BM_AD_LIKE (AD, MEMBER) VALUES (#{ad}, #{member})
+    </insert>
+    <delete id="deleteAdLike">
+        DELETE FROM BM_AD_LIKE WHERE AD = #{ad} AND MEMBER = #{member}
+    </delete>
+</mapper>

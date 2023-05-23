@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>테스트</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+   <!-- <script>
+        function getToken(){
+            var data = {
+                returnurl : 'https://m.nemoview.com/auth_result'
+            };
+            $.ajax({
+                type: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-HTTP-Method-Override": "POST",
+                    "Accept":"*/*"
+                },
+                url: "https://api.nemoview.com/member/auth",
+                data: JSON.stringify(data),
+                success: function(result) {
+                    console.log(result);
+                    $('#enc_data').val(result.BODY.enc_data);
+                    $('#integrity_value').val(result.BODY.integrity_value);
+                    $('#token_version_id').val(result.BODY.dataBody.token_version_id);
+                },
+                error: function(result) {
+                    console.log(result);
+                }
+            });
+        }
+
+        $(document).ready(function(){
+           getToken();
+        });
+    </script>-->
+</head>
+<body>
+<div>
+    <form name="form" id="form" action="/main/test" method="post">
+        <input type="text" id="m" name="m" value="service" />
+        <input type="text" id="token_version_id" name="token_version_id"/>
+        <input type="text" id="enc_data" name="enc_data"/>
+        <input type="text" id="integrity_value" name="integrity_value"/>
+        <input type="submit"/>
+    </form>
+
+    BM INDEX
+</div>
+</body>
+</html>

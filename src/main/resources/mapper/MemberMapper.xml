@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jamie.home.api.dao.MemberDao">
+    <sql id="memberList">
+        <if test="searchKeyword != null">
+            <if test="searchType == 'member'.toString()">
+            </if>
+        </if>
+    </sql>
+    <sql id="memberListOrder">
+        ORDER BY
+        <if test="orderType != null">
+            <choose>
+                <when test="orderType == 'reg_date_desc'.toString()">REGDATE DESC, </when>
+            </choose>
+        </if>
+        MEMBER DESC
+    </sql>
+    <select id="getListMember" resultType="com.jamie.home.api.model.MEMBER">
+        SELECT *
+        FROM BM_MEMBER
+        WHERE 1=1
+        <include refid="memberList"></include>
+        <include refid="memberListOrder"></include>
+        <if test="start != null">
+            LIMIT #{start}, #{page_block}
+        </if>
+    </select>
+
+    <select id="getListMemberCnt" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM BM_MEMBER
+        WHERE 1=1
+        <include refid="memberList"></include>
+    </select>
+
+    <select id="getMember" resultType="com.jamie.home.api.model.MEMBER">
+        SELECT
+            *, (SELECT SUM(POINT) FROM BM_MEMBER_POINT WHERE MEMBER = BM_MEMBER.MEMBER) AS POINT
+        FROM BM_MEMBER
+        WHERE MEMBER = #{member}
+    </select>
+
+    <insert id="insertMember" parameterType="com.jamie.home.api.model.MEMBER" useGeneratedKeys="true" keyProperty="member">
+        INSERT INTO BM_MEMBER (
+            EMAIL, PASSWORD, NAME, PHONE, COMPANY, ROLE
+        <if test="position != null">, POSITION</if>
+        <if test="company_size != null">, COMPANY_SIZE</if>
+        <if test="inflow != null">, INFLOW</if>
+        ) VALUES (
+            #{email}, #{password}, #{name}, #{phone}, #{company}, #{role}
+        <if test="position != null">, #{position}</if>
+        <if test="company_size != null">, #{company_size}</if>
+        <if test="inflow != null">, #{inflow}</if>
+        )
+    </insert>
+
+    <update id="updateMember">
+        UPDATE BM_MEMBER SET UPDDATE = now()
+        <if test="password != null">,PASSWORD = #{password}</if>
+        <if test="name != null">,NAME = #{name}</if>
+        <if test="phone != null">,PHONE = #{phone}</if>
+        <if test="company != null">,COMPANY = #{company}</if>
+        <if test="position != null">,POSITION = #{position}</if>
+        <if test="company_size != null">,COMPANY_SIZE = #{company_size}</if>
+        <if test="inflow != null">,INFLOW = #{inflow}</if>
+        <if test="tax_name != null">,TAX_NAME = #{tax_name}</if>
+        <if test="tax_phone != null">,TAX_PHONE = #{tax_phone}</if>
+        <if test="tax_email != null">,TAX_EMAIL = #{tax_email}</if>
+        <if test="tax_file != null">,TAX_FILE = #{tax_file}</if>
+        WHERE MEMBER = #{member}
+    </update>
+
+    <select id="getByParam" resultType="com.jamie.home.api.model.MEMBER">
+        SELECT
+            *, (SELECT SUM(POINT) FROM BM_MEMBER_POINT WHERE MEMBER = BM_MEMBER.MEMBER) AS POINT
+        FROM BM_MEMBER
+        WHERE 1=1
+        <if test="email != null">
+            AND EMAIL = #{email}
+        </if>
+        <if test="name != null">
+            AND NAME = #{name}
+        </if>
+    </select>
+
+    <delete id="deleteMember">
+        DELETE FROM BM_MEMBER WHERE MEMBER = #{member}
+    </delete>
+
+    <insert id="upsertMemberDuple">
+        UPSERT INTO MEMBER_DUPLE (EMAIL, CODE) VALUES (#{email}, #{code})
+        ON DUPLICATE KEY UPDATE UPDDATE = NOW(),  CODE = #{code}
+    </insert>
+</mapper>
