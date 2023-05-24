@@ -72,7 +72,7 @@ public class AdController {
         }
     }
 
-    @RequestMapping(value={"/{key}","/{key}/keyword","/{key}/price"}, method= RequestMethod.PUT)
+    @RequestMapping(value={"/{key}","/{key}/keyword","/{key}/price","/{key}/state"}, method= RequestMethod.PUT)
     public ResponseOverlays modify(@PathVariable("key") int key, @Validated @RequestBody AD ad) {
         try {
             ad.setAd(key);

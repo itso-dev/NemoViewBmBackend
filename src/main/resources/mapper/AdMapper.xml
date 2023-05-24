@@ -43,15 +43,16 @@
 
     <insert id="insertAd" parameterType="com.jamie.home.api.model.AD" useGeneratedKeys="true" keyProperty="ad">
         INSERT INTO BM_AD (
-            TITLE, CATEGORY, BRAND, NAME, PRICE, DISCOUNT, LINK, KEYWORDS, IMAGES, IMAGE_SUPPORT)
+            MEMBER, TITLE, TYPE, CATEGORY, BRAND, NAME, PRICE, DISCOUNT, LINK, KEYWORDS, IMAGES, IMAGE_SUPPORT
         ) VALUES (
-            #{title}, #{category}, #{brand}, #{name}, #{price}, #{discount}, #{link}, #{keywords}, #{images}, #{image_support}
+            #{member}, #{title}, #{type}, #{category}, #{brand}, #{name}, #{price}, #{discount}, #{link}, #{keywords}, #{images}, #{image_support}
         )
     </insert>
 
     <update id="updateAd">
         UPDATE BM_AD SET UPDDATE = now()
         <if test="title != null">,TITLE = #{title}</if>
+        <if test="type != null">,TYPE = #{type}</if>
         <if test="category != null">,CATEGORY = #{category}</if>
         <if test="brand != null">,BRAND = #{brand}</if>
         <if test="name != null">,NAME = #{name}</if>
@@ -63,7 +64,7 @@
         <if test="image_support != null">,IMAGE_SUPPORT = #{image_support}</if>
         <if test="click_price != null">,CLICK_PRICE = #{click_price}</if>
         <if test="day_price != null">,DAY_PRICE = #{day_price}</if>
-        <if test="show != null">,SHOW = #{show}</if>
+        <if test="shows != null">,SHOWS = #{shows}</if>
         <if test="state != null">,STATE = #{state}</if>
         WHERE AD = #{ad}
     </update>

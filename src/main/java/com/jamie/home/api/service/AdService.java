@@ -1,10 +1,13 @@
 package com.jamie.home.api.service;
 
+import com.jamie.home.api.controller.AdController;
 import com.jamie.home.api.model.KEYWORD;
 import com.jamie.home.api.model.SEARCH;
 import com.jamie.home.api.model.AD;
 import com.jamie.home.api.service.BasicService;
 import com.jamie.home.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +18,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class AdService extends BasicService {
+    private static final Logger logger = LoggerFactory.getLogger(AdService.class);
+
     public List<AD> list(SEARCH search) {
         return adDao.getListAd(search);
     }
@@ -35,7 +40,6 @@ public class AdService extends BasicService {
                         uploadDir
                 )
         );
-
         return adDao.insertAd(ad);
     }
 
@@ -100,10 +104,10 @@ public class AdService extends BasicService {
 
     public int modifyKeywordMandatory(AD ad) {
         // 공통 키워드
-        List<KEYWORD> commonKeywords = ad.getCommonKeywordList().stream().filter(k -> k.getMandatory()).collect(Collectors.toList());
+        List<KEYWORD> commonKeywords = ad.getCommonKeywordList().stream().filter(k -> k.getMandatory()!= null && k.getMandatory()).collect(Collectors.toList());
         commonKeywords.forEach(keyword -> adDao.updateAdCommonKeyword(keyword));
         // 필수 키워드
-        List<KEYWORD> mandatoryKeyowrds = ad.getKeywordList().stream().filter(k -> k.getMandatory()).collect(Collectors.toList());
+        List<KEYWORD> mandatoryKeyowrds = ad.getKeywordList().stream().filter(k -> k.getMandatory()!= null && k.getMandatory()).collect(Collectors.toList());
         mandatoryKeyowrds.forEach(keyword -> adDao.updateAdKeyword(keyword));
         return 1;
     }
