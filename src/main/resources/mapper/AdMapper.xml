@@ -3,6 +3,9 @@
 
 <mapper namespace="com.jamie.home.api.dao.AdDao">
     <sql id="List">
+        <if test="member != null">
+            AND MEMBER = #{member}
+        </if>
         <if test="searchKeyword != null">
             <if test="searchType == 'ad'.toString()">
             </if>
@@ -64,15 +67,18 @@
         <if test="image_support != null">,IMAGE_SUPPORT = #{image_support}</if>
         <if test="click_price != null">,CLICK_PRICE = #{click_price}</if>
         <if test="day_price != null">,DAY_PRICE = #{day_price}</if>
-        <if test="shows != null">,SHOWS = #{shows}</if>
         <if test="state != null">,STATE = #{state}</if>
+        <if test="state_error != null">,STATE_ERROR = #{state_error}</if>
         WHERE AD = #{ad}
     </update>
     <delete id="deleteAd">
         DELETE FROM BM_AD WHERE AD = #{ad}
     </delete>
     <select id="getAdCommonKeyword" resultType="com.jamie.home.api.model.KEYWORD">
-        SELECT * FROM BM_AD_COMMON_KEYWORD WHERE AD = #{ad}
+        SELECT BACK.*, CK.NAME AS NAME
+        FROM BM_AD_COMMON_KEYWORD BACK
+            LEFT JOIN COMMON_KEYWORD CK ON CK.COMMON_KEYWORD = BACK.COMMON_KEYWORD
+        WHERE AD = #{ad}
     </select>
     <insert id="insertAdCommonKeyword">
         INSERT INTO BM_AD_COMMON_KEYWORD (AD, COMMON_KEYWORD) VALUES
@@ -80,14 +86,17 @@
             (#{ad}, #{keyword.common_keyword})
         </foreach>
     </insert>
-    <update id="updateAdCommonKeyword">
+    <update id="updateAdCommonKeywordMandatory">
         UPDATE BM_AD_COMMON_KEYWORD SET MANDATORY = #{mandatory} WHERE AD_COMMON_KEYWORD = #{ad_common_keyword}
     </update>
     <delete id="deleteAdCommonKeyword">
         DELETE FROM BM_AD_COMMON_KEYWORD WHERE AD = #{ad} AND COMMON_KEYWORD = #{common_keyword}
     </delete>
     <select id="getAdKeyword" resultType="com.jamie.home.api.model.KEYWORD">
-        SELECT * FROM BM_AD_KEYWORD WHERE AD = #{ad}
+        SELECT BAK.*, CK.NAME AS NAME
+        FROM BM_AD_KEYWORD BAK
+        LEFT JOIN CATEGORY_KEYWORD CK ON CK.KEYWORD = BAK.KEYWORD
+        WHERE AD = #{ad}
     </select>
     <insert id="insertAdKeyword">
         INSERT INTO BM_AD_KEYWORD (AD, KEYWORD) VALUES
@@ -95,7 +104,7 @@
             (#{ad}, #{keyword.keyword})
         </foreach>
     </insert>
-    <update id="updateAdKeyword">
+    <update id="updateAdKeywordMandatory">
         UPDATE BM_AD_KEYWORD SET MANDATORY = #{mandatory} WHERE AD_KEYWORD = #{ad_keyword}
     </update>
     <delete id="deleteAdKeyword">
@@ -113,4 +122,63 @@
     <delete id="deleteAdLike">
         DELETE FROM BM_AD_LIKE WHERE AD = #{ad} AND MEMBER = #{member}
     </delete>
+
+    <sql id="periodSql">
+        <if test="filter_name != null">
+            <choose>
+                <when test="filter_name == 'today'.toString()">
+                    AND REGDATE >= DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')
+                    AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59') >= REGDATE
+                </when>
+                <when test="filter_name == 'yesterday'.toString()">
+                    AND REGDATE >= DATE_FORMAT(NOW() - interval 1 day, '%Y-%m-%d 00:00:00')
+                    AND DATE_FORMAT(NOW() - interval 1 day, '%Y-%m-%d 23:59:59') >= REGDATE
+                </when>
+                <when test="filter_name == 'last7'.toString()">
+                    AND REGDATE >= DATE_FORMAT(NOW() - interval 7 day, '%Y-%m-%d 00:00:00')
+                    AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59') >= REGDATE
+                </when>
+                <when test="filter_name == 'last30'.toString()">
+                    AND REGDATE >= DATE_FORMAT(NOW() - interval 1 month, '%Y-%m-%d 00:00:00')
+                    AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59') >= REGDATE
+                </when>
+                <when test="filter_name == 'custom'.toString()">
+                    AND REGDATE >= #{start_date} AND #{end_date} >= REGDATE
+                </when>
+            </choose>
+        </if>
+    </sql>
+
+    <select id="getListAdShowCnt" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BM_AD_SHOW
+        WHERE AD = #{ad}
+        <include refid="periodSql"></include>
+    </select>
+
+    <select id="getListClickMemberCnt" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BM_AD_HIT WHERE AD = #{ad}
+        <include refid="periodSql"></include>
+    </select>
+
+    <select id="getClickMemberKeyword" resultType="com.jamie.home.api.model.KEYWORD">
+        SELECT *
+        FROM
+        (
+            SELECT NAME, COUNT(*) AS CNT, 1 AS TYPE
+            FROM MEMBER_KEYWORD MK
+                LEFT JOIN CATEGORY_KEYWORD CK on MK.KEYWORD = CK.KEYWORD
+            WHERE MEMBER IN (SELECT DISTINCT MEMBER FROM BM_AD_HIT WHERE AD = #{ad})
+            GROUP BY NAME
+
+        UNION
+
+            SELECT NAME, COUNT(*) AS CNT, 2 AS TYPE
+            FROM MEMBER_COMMON_KEYWORD MCK
+                LEFT JOIN COMMON_KEYWORD CK on MCK.COMMON_KEYWORD = CK.COMMON_KEYWORD
+            WHERE MEMBER IN (SELECT DISTINCT MEMBER FROM BM_AD_HIT WHERE AD = #{ad})
+            GROUP BY NAME
+        ) AS G
+        ORDER BY G.CNT DESC
+        LIMIT 0,10
+    </select>
 </mapper>

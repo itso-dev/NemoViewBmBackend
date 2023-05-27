@@ -22,6 +22,11 @@ public class SEARCH {
     private Integer member;
     private String email;
 
+    // 광고
+    private String filter_name;
+    private String start_date;
+    private String end_date;
+
     public void calStart(){
         this.start = (this.page-1) * this.page_block;
     }

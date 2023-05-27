@@ -19,5 +19,6 @@ public class KEYWORD {
     private Integer category;
     private Integer classification;
     private String name;
+    private Integer type;
     private Integer cnt;
 }

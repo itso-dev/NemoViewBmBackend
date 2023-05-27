@@ -69,6 +69,8 @@
         <if test="tax_phone != null">,TAX_PHONE = #{tax_phone}</if>
         <if test="tax_email != null">,TAX_EMAIL = #{tax_email}</if>
         <if test="tax_file != null">,TAX_FILE = #{tax_file}</if>
+        <if test="info_mobile != null">,INFO_MOBILE = #{info_mobile}</if>
+        <if test="info_email != null">,INFO_EMAIL = #{info_email}</if>
         WHERE MEMBER = #{member}
     </update>
 

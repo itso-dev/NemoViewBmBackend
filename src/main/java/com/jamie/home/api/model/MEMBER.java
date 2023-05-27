@@ -28,6 +28,8 @@ public class MEMBER {
     private String tax_phone;
     private String tax_email;
     private String tax_file;
+    private Boolean info_mobile;
+    private Boolean info_email;
     @Enumerated(EnumType.STRING)
     private ROLE role;
     private Date regdate;

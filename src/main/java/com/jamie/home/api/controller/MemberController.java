@@ -81,7 +81,7 @@ public class MemberController {
         }
     }
 
-    @RequestMapping(value={"/{key}","/{key}/password"}, method= RequestMethod.PUT)
+    @RequestMapping(value={"/{key}","/{key}/password","/{key}/info"}, method= RequestMethod.PUT)
     public ResponseOverlays modify(@PathVariable("key") int key, @Validated @RequestBody MEMBER member) {
         try {
             member.setMember(key);

@@ -19,14 +19,17 @@ public interface AdDao {
     Integer deleteAd(AD ad);
     List<KEYWORD> getAdCommonKeyword(AD ad);
     Integer insertAdCommonKeyword(AD ad);
-    Integer updateAdCommonKeyword(KEYWORD keyword);
+    Integer updateAdCommonKeywordMandatory(KEYWORD keyword);
     Integer deleteAdCommonKeyword(KEYWORD keyword);
     List<KEYWORD> getAdKeyword(AD ad);
     Integer insertAdKeyword(AD ad);
-    Integer updateAdKeyword(KEYWORD keyword);
+    Integer updateAdKeywordMandatory(KEYWORD keyword);
     Integer deleteAdKeyword(KEYWORD keyword);
     Integer insertAdHit(AD ad);
     Integer getAdLike(AD ad);
     Integer insertAdLike(AD ad);
     Integer deleteAdLike(AD ad);
+    Integer getListAdShowCnt(AD ad);
+    Integer getListClickMemberCnt(AD ad);
+    List<KEYWORD> getClickMemberKeyword(AD ad);
 }

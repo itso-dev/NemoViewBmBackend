@@ -21,7 +21,14 @@ public class AdService extends BasicService {
     private static final Logger logger = LoggerFactory.getLogger(AdService.class);
 
     public List<AD> list(SEARCH search) {
-        return adDao.getListAd(search);
+        List<AD> list = adDao.getListAd(search);
+        for(int i=0; i<list.size(); i++){
+            list.get(i).setFilter_name(search.getFilter_name());
+            list.get(i).setStart_date(search.getStart_date());
+            list.get(i).setEnd_date(search.getEnd_date());
+            setDetailInfo(list.get(i));
+        }
+        return list;
     }
 
     public Integer listCnt(SEARCH search) {
@@ -29,7 +36,19 @@ public class AdService extends BasicService {
     }
 
     public AD get(AD ad){
-        return adDao.getAd(ad);
+        AD result = adDao.getAd(ad);
+        result.setFilter_name(ad.getFilter_name());
+        result.setStart_date(ad.getStart_date());
+        result.setEnd_date(ad.getEnd_date());
+        setDetailInfo(result);
+        return result;
+    }
+
+    private void setDetailInfo(AD ad){
+        ad.setCommonKeywordList(adDao.getAdCommonKeyword(ad));
+        ad.setKeywordList(adDao.getAdKeyword(ad));
+        ad.setShows(adDao.getListAdShowCnt(ad));
+        ad.setHits(adDao.getListClickMemberCnt(ad));
     }
 
     public Integer save(AD ad) throws Exception {
@@ -46,14 +65,15 @@ public class AdService extends BasicService {
     public Integer modify(AD ad) throws Exception {
         AD ori_ad = adDao.getAd(ad);
         // 이미지 수정
-        ad.setImages(
-                FileUtils.modiFiles(
-                        ori_ad.getImages(),
-                        ad.getImages_del(),
-                        ad.getImages_new(),
-                        uploadDir
-                )
-        );
+        if(ad.getImages_new() != null){
+            ad.setImages(
+                    FileUtils.modiOneFiles(
+                            ori_ad.getImages(),
+                            ad.getImages_new(),
+                            uploadDir
+                    )
+            );
+        }
 
         Integer result = adDao.updateAd(ad);
 
@@ -104,11 +124,17 @@ public class AdService extends BasicService {
 
     public int modifyKeywordMandatory(AD ad) {
         // 공통 키워드
-        List<KEYWORD> commonKeywords = ad.getCommonKeywordList().stream().filter(k -> k.getMandatory()!= null && k.getMandatory()).collect(Collectors.toList());
-        commonKeywords.forEach(keyword -> adDao.updateAdCommonKeyword(keyword));
+        ad.getCommonKeywordList().forEach(keyword -> adDao.updateAdCommonKeywordMandatory(keyword));
         // 필수 키워드
-        List<KEYWORD> mandatoryKeyowrds = ad.getKeywordList().stream().filter(k -> k.getMandatory()!= null && k.getMandatory()).collect(Collectors.toList());
-        mandatoryKeyowrds.forEach(keyword -> adDao.updateAdKeyword(keyword));
+        ad.getKeywordList().forEach(keyword -> adDao.updateAdKeywordMandatory(keyword));
         return 1;
+    }
+
+    public int remove(AD ad) {
+        return adDao.deleteAd(ad);
+    }
+
+    public List<KEYWORD> getClickMemberKeyword(AD ad) {
+        return adDao.getClickMemberKeyword(ad);
     }
 }

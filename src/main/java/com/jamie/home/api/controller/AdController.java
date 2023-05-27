@@ -57,6 +57,46 @@ public class AdController {
         }
     }
 
+    @RequestMapping(value="/{key}/{filter_name}/{start_date}/{end_date}", method= RequestMethod.GET)
+    public ResponseOverlays getDetail(@PathVariable("key") int key,
+                                      @PathVariable("filter_name") String filter_name,
+                                      @PathVariable("start_date") String start_date,
+                                      @PathVariable("end_date") String end_date) {
+        try {
+            AD ad = new AD();
+            ad.setAd(key);
+            ad.setFilter_name(filter_name);
+            ad.setStart_date(start_date);
+            ad.setEnd_date(end_date);
+            AD result = adService.get(ad);
+            if(result != null){
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_AD_SUCCESS", result);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_NULL", false);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_FAIL", false);
+        }
+    }
+
+    @RequestMapping(value="/{key}/click/member/keyword", method= RequestMethod.GET)
+    public ResponseOverlays getClickMemberKeyword(@PathVariable("key") int key) {
+        try {
+            AD ad = new AD();
+            ad.setAd(key);
+            List<KEYWORD> result = adService.getClickMemberKeyword(ad);
+            if(result != null){
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_AD_SUCCESS", result);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_NULL", false);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_FAIL", false);
+        }
+    }
+
     @RequestMapping(value="/save", method= RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseOverlays save(@Validated @ModelAttribute AD ad) {
         try {
@@ -64,7 +104,9 @@ public class AdController {
             if(result == 0){
                 return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_AD_NOT_SAVE", false);
             } else {
-                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_AD_SUCCESS", true);
+                AD return_ad = new AD();
+                return_ad.setAd(ad.getAd());
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_AD_SUCCESS", return_ad);
             }
         } catch (Exception e){
             logger.error(e.getLocalizedMessage());
@@ -117,6 +159,23 @@ public class AdController {
         } catch (Exception e){
             logger.error(e.getLocalizedMessage());
             return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_AD_FAIL", false);
+        }
+    }
+
+    @RequestMapping(value="/{key}", method= RequestMethod.DELETE)
+    public ResponseOverlays remove(@PathVariable("key") int key) {
+        try {
+            AD ad = new AD();
+            ad.setAd(key);
+            int result = adService.remove(ad);
+            if(result == 0){
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "DELETE_AD_NOT_SAVE", false);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "DELETE_AD_SUCCESS", true);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "DELETE_AD_FAIL", false);
         }
     }
 }
