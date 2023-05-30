@@ -1,8 +1,8 @@
 package com.jamie.home.api.controller;
 
 import com.jamie.home.api.model.MEMBER;
+import com.jamie.home.api.model.POINT;
 import com.jamie.home.api.model.ResponseOverlays;
-import com.jamie.home.api.model.SEARCH;
 import com.jamie.home.api.model.TOKEN;
 import com.jamie.home.api.service.MailService;
 import com.jamie.home.api.service.MemberService;
@@ -166,6 +166,22 @@ public class MemberController {
         } catch (Exception e){
             logger.error(e.getLocalizedMessage());
             return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_MEMBER_FAIL", false);
+        }
+    }
+
+    @RequestMapping(value="/{key}/point", method= RequestMethod.PUT)
+    public ResponseOverlays modifyPoint(@PathVariable("key") int key, @Validated @RequestBody POINT point) {
+        try {
+            point.setMember(key);
+            int result = memberService.modifyPoint(point);
+            if(result == 0){
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_MEMBER_NOT_SAVE", false);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_MEMBER_SUCCESS", true);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_MEMBER_FAIL", false);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.jamie.home.api.service;
 
 import com.jamie.home.api.dao.AdDao;
+import com.jamie.home.api.dao.InfoDao;
 import com.jamie.home.api.dao.MemberDao;
 import com.jamie.home.api.dao.ServiceDao;
 import org.slf4j.Logger;
@@ -26,6 +27,8 @@ public class BasicService {
     ServiceDao serviceDao;
     @Autowired
     AdDao adDao;
+    @Autowired
+    InfoDao infoDao;
     @Autowired
     JavaMailSender javaMailSender;
 }

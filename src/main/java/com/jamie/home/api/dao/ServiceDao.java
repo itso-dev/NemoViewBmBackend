@@ -1,6 +1,5 @@
 package com.jamie.home.api.dao;
 
-import com.jamie.home.api.model.MEMBER;
 import com.jamie.home.api.model.SEARCH;
 import com.jamie.home.api.model.SERVICE;
 import org.apache.ibatis.annotations.Mapper;

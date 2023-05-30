@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jamie.home.api.dao.InfoDao">
+    <sql id="List">
+        <if test="searchKeyword != null">
+            <if test="searchType == 'member_info'.toString()">
+            </if>
+        </if>
+        <if test="member != null">
+            AND MEMBER = #{member}
+        </if>
+    </sql>
+    <sql id="ListOrder">
+        ORDER BY
+        <if test="orderType != null">
+            <choose>
+                <when test="orderType == 'reg_date_desc'.toString()">REGDATE DESC, </when>
+            </choose>
+        </if>
+        MEMBER_INFO DESC
+    </sql>
+    <select id="getListInfo" resultType="com.jamie.home.api.model.INFO">
+        SELECT *
+        FROM BM_MEMBER_INFO
+        WHERE 1=1
+        <include refid="List"></include>
+        <include refid="ListOrder"></include>
+        <if test="start != null">
+            LIMIT #{start}, #{page_block}
+        </if>
+    </select>
+
+    <select id="getListInfoCnt" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM BM_MEMBER_INFO
+        WHERE 1=1
+        <include refid="List"></include>
+    </select>
+
+    <insert id="insertInfo" parameterType="com.jamie.home.api.model.INFO" useGeneratedKeys="true" keyProperty="member_info">
+        INSERT INTO BM_MEMBER_INFO (
+            MEMBER, CONTENT
+        ) VALUES (
+            #{member}, #{content}
+        )
+    </insert>
+
+    <update id="updateInfoChk">
+        UPDATE BM_MEMBER_INFO SET UPDDATE = now(), CHK = TRUE WHERE MEMBER_INFO = #{member_info}
+    </update>
+</mapper>

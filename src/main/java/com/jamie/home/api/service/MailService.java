@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.internet.MimeMessage;
-import java.util.UUID;
 
 @Service
 @Transactional

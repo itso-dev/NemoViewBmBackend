@@ -181,4 +181,8 @@
         ORDER BY G.CNT DESC
         LIMIT 0,10
     </select>
+
+    <update id="updateAdStateAll">
+        UPDATE BM_AD SET UPDDATE = now(), STATE = 3, STATE_ERROR = '보유 포인트 부족' WHERE MEMBER = #{member}
+    </update>
 </mapper>

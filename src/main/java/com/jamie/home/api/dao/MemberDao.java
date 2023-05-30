@@ -1,6 +1,7 @@
 package com.jamie.home.api.dao;
 
 import com.jamie.home.api.model.MEMBER;
+import com.jamie.home.api.model.POINT;
 import com.jamie.home.api.model.SEARCH;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -18,6 +19,8 @@ public interface MemberDao {
     Integer deleteMember(MEMBER member);
 
     MEMBER getByParam(MEMBER member);
-
     Integer upsertMemberDuple(SEARCH search);
+    Integer insertMemberPoint(POINT point);
+
+    Integer getMemberPoint(MEMBER member);
 }

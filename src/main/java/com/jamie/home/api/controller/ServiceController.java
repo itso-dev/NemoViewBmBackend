@@ -1,22 +1,13 @@
 package com.jamie.home.api.controller;
 
-import com.jamie.home.api.model.*;
-import com.jamie.home.api.service.MailService;
-import com.jamie.home.api.service.MemberService;
+import com.jamie.home.api.model.ResponseOverlays;
+import com.jamie.home.api.model.SEARCH;
+import com.jamie.home.api.model.SERVICE;
+import com.jamie.home.api.model.VoList;
 import com.jamie.home.api.service.ServiceService;
-import com.jamie.home.jwt.JwtFilter;
-import com.jamie.home.jwt.TokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

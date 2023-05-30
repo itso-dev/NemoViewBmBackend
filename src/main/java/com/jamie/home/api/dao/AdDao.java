@@ -1,8 +1,8 @@
 package com.jamie.home.api.dao;
 
 import com.jamie.home.api.model.AD;
-import com.jamie.home.api.model.SEARCH;
 import com.jamie.home.api.model.KEYWORD;
+import com.jamie.home.api.model.SEARCH;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -32,4 +32,6 @@ public interface AdDao {
     Integer getListAdShowCnt(AD ad);
     Integer getListClickMemberCnt(AD ad);
     List<KEYWORD> getClickMemberKeyword(AD ad);
+
+    void updateAdStateAll(AD ad);
 }

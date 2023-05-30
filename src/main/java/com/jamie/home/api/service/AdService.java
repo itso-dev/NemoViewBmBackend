@@ -1,10 +1,6 @@
 package com.jamie.home.api.service;
 
-import com.jamie.home.api.controller.AdController;
-import com.jamie.home.api.model.KEYWORD;
-import com.jamie.home.api.model.SEARCH;
-import com.jamie.home.api.model.AD;
-import com.jamie.home.api.service.BasicService;
+import com.jamie.home.api.model.*;
 import com.jamie.home.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,6 +118,39 @@ public class AdService extends BasicService {
         return result;
     }
 
+    public Integer modifyState(AD ad) {
+        AD ori_ad = adDao.getAd(ad);
+        // 0: 임시저장(광고셋팅중), 1: 저장완료(검수중), 2: 검수완료(진행중), 3: 광고중지 (STATE_ERROR 수정), 4: 광고반려
+        if(ori_ad.getState() == 0 && ad.getState() == 1){
+            // 알림 TYPE 1
+            INFO info = new INFO(ad.getMember(),ori_ad.getTitle()+" 광고가 검수 작업에 들어갔습니다.");
+            infoDao.insertInfo(info);
+        } else if(ori_ad.getState() == 1 && ad.getState() == 2){
+            // 알림 TYPE 2
+            INFO info = new INFO(ad.getMember(),ori_ad.getTitle()+" 광고가 검수 완료하였습니다.");
+            infoDao.insertInfo(info);
+            MEMBER member = new MEMBER();
+            member.setMember(ad.getMember());
+            if(memberDao.getMemberPoint(member) <= 0){
+                ad.setState(3);
+                ad.setState_error("보유 포인트 부족");
+            }
+        } else if(ori_ad.getState() == 1 && ad.getState() == 4){
+            // 알림 TYPE 5
+            INFO info = new INFO(ad.getMember(),ori_ad.getTitle()+" 광고가 반려되었습니다.");
+            infoDao.insertInfo(info);
+        } else if(ori_ad.getState() == 2 && ad.getState() == 3){ // 광고 중지
+            // 알림 TYPE 3
+            INFO info = new INFO(ad.getMember(),ori_ad.getTitle()+" 광고가 중지 되었습니다.\n재개를 원하실 경우 광고 페이지에서 재설정해주세요!");
+            infoDao.insertInfo(info);
+        } else if(ori_ad.getState() == 3 && ad.getState() == 2){ // 광고 재개
+            // 알림 TYPE 4
+            INFO info = new INFO(ad.getMember(),ori_ad.getTitle()+" 광고가 다시 게시되었습니다.");
+            infoDao.insertInfo(info);
+        }
+        return adDao.updateAd(ad);
+    }
+
     public int modifyKeywordMandatory(AD ad) {
         // 공통 키워드
         ad.getCommonKeywordList().forEach(keyword -> adDao.updateAdCommonKeywordMandatory(keyword));
@@ -136,5 +165,42 @@ public class AdService extends BasicService {
 
     public List<KEYWORD> getClickMemberKeyword(AD ad) {
         return adDao.getClickMemberKeyword(ad);
+    }
+
+    public int saveAdLike(AD ad) {
+        return adDao.insertAdLike(ad);
+    }
+
+    public int saveAdHit(AD ad) {
+        // 클릭당 비용 삭감
+        AD ori_ad = adDao.getAd(ad);
+        MEMBER ad_member = memberDao.getMember(new MEMBER(ori_ad.getMember()));
+        Integer member_point = memberDao.getMemberPoint(ad_member);
+
+        if(member_point <= 0){ // 광고 중지 (보유 포인트 부족)
+            adDao.updateAdStateAll(ori_ad);
+        } else {
+            if(ad.getClick_price() >= member_point){ // 포인트 차감 후 광고 중지 (보유 포인트 부족)
+                memberDao.insertMemberPoint(new POINT(ad_member.getMember(), member_point*(-1), ori_ad.getTitle() + " 광고 클릭 비용 (보유 포인트 부족)"));
+                adDao.updateAdStateAll(ori_ad);
+            } else {
+                memberDao.insertMemberPoint(new POINT(ad_member.getMember(), ad.getClick_price()*(-1), ori_ad.getTitle() + " 광고 클릭 비용"));
+            }
+        }
+
+        Integer re_member_point = memberDao.getMemberPoint(ad_member);
+        if(re_member_point <= 0){
+            // 알림 TYPE 7
+            INFO info = new INFO(ad_member.getMember(),"포인트가 모두 소진되었습니다.");
+            infoDao.insertInfo(info);
+        } else if(re_member_point <= 1000){
+            // 알림 TYPE 8
+            INFO info = new INFO(ad_member.getMember(),"포인트가 1,000P 이하입니다.");
+            infoDao.insertInfo(info);
+        }
+
+        adDao.insertAdHit(ad);
+
+        return 1;
     }
 }

@@ -1,9 +1,7 @@
 package com.jamie.home.api.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jamie.home.api.model.MEMBER;
-import com.jamie.home.api.model.ROLE;
-import com.jamie.home.api.model.SEARCH;
+import com.jamie.home.api.model.*;
 import com.jamie.home.util.CodeUtils;
 import com.jamie.home.util.FileUtils;
 import org.springframework.stereotype.Service;
@@ -23,7 +21,13 @@ public class MemberService extends BasicService{
     }
 
     public MEMBER get(MEMBER member){
-        return memberDao.getMember(member);
+        MEMBER result = memberDao.getMember(member);
+        setDetailInfo(result);
+        return result;
+    }
+
+    private void setDetailInfo(MEMBER member){
+        member.setPoint(memberDao.getMemberPoint(member));
     }
 
     public Integer save(MEMBER member) throws JsonProcessingException {
@@ -68,5 +72,14 @@ public class MemberService extends BasicService{
             return member;
         }
         return result;
+    }
+
+    public Integer modifyPoint(POINT point) {
+        if(point.getPoint() > 0){ // 충전
+            // 알림 TYPE 6
+            INFO info = new INFO(point.getMember(),"포인트 "+point.getPoint()+"P 충전되셨습니다.");
+            infoDao.insertInfo(info);
+        }
+        return memberDao.insertMemberPoint(point);
     }
 }

@@ -36,10 +36,13 @@
     </select>
 
     <select id="getMember" resultType="com.jamie.home.api.model.MEMBER">
-        SELECT
-            *, (SELECT SUM(POINT) FROM BM_MEMBER_POINT WHERE MEMBER = BM_MEMBER.MEMBER) AS POINT
+        SELECT *
         FROM BM_MEMBER
         WHERE MEMBER = #{member}
+    </select>
+
+    <select id="getMemberPoint" resultType="java.lang.Integer">
+        SELECT SUM(POINT) FROM BM_MEMBER_POINT WHERE MEMBER = #{member}
     </select>
 
     <insert id="insertMember" parameterType="com.jamie.home.api.model.MEMBER" useGeneratedKeys="true" keyProperty="member">
@@ -94,5 +97,9 @@
     <insert id="upsertMemberDuple">
         UPSERT INTO MEMBER_DUPLE (EMAIL, CODE) VALUES (#{email}, #{code})
         ON DUPLICATE KEY UPDATE UPDDATE = NOW(),  CODE = #{code}
+    </insert>
+
+    <insert id="insertMemberPoint">
+        INSERT INTO BM_MEMBER_POINT (MEMBER, POINT, CONTENT) VALUES (#{member}, #{point}, #{content})
     </insert>
 </mapper>

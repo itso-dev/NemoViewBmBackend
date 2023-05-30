@@ -2,7 +2,6 @@ package com.jamie.home.api.controller;
 
 import com.jamie.home.api.model.*;
 import com.jamie.home.api.service.AdService;
-import com.jamie.home.api.service.ServiceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,11 +113,27 @@ public class AdController {
         }
     }
 
-    @RequestMapping(value={"/{key}","/{key}/keyword","/{key}/price","/{key}/state"}, method= RequestMethod.PUT)
+    @RequestMapping(value={"/{key}","/{key}/keyword","/{key}/price"}, method= RequestMethod.PUT)
     public ResponseOverlays modify(@PathVariable("key") int key, @Validated @RequestBody AD ad) {
         try {
             ad.setAd(key);
             int result = adService.modify(ad);
+            if(result == 0){
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_AD_NOT_SAVE", false);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_AD_SUCCESS", true);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_AD_FAIL", false);
+        }
+    }
+
+    @RequestMapping(value="/{key}/state", method= RequestMethod.PUT)
+    public ResponseOverlays modifyState(@PathVariable("key") int key, @Validated @RequestBody AD ad) {
+        try {
+            ad.setAd(key);
+            int result = adService.modifyState(ad);
             if(result == 0){
                 return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_AD_NOT_SAVE", false);
             } else {
