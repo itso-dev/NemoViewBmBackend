@@ -45,4 +45,6 @@ public class AD {
     private String filter_name;
     private String start_date;
     private String end_date;
+
+    private Boolean likeYn;
 }

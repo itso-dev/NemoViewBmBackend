@@ -24,7 +24,7 @@ public class UserController {
     @RequestMapping(value="/ad/list", method= RequestMethod.POST)
     public ResponseOverlays list(@Validated @RequestBody SEARCH search) {
         try {
-            List<AD> list = adService.list(search);
+            List<AD> list = adService.listForUser(search);
 
             if(list != null){
                 Integer cnt = adService.listCnt(search);

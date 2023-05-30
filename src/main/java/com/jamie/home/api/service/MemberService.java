@@ -28,6 +28,9 @@ public class MemberService extends BasicService{
 
     private void setDetailInfo(MEMBER member){
         member.setPoint(memberDao.getMemberPoint(member));
+        SEARCH search = new SEARCH();
+        search.setMember(member.getMember());
+        member.setInfoList(infoDao.getListInfo(search));
     }
 
     public Integer save(MEMBER member) throws JsonProcessingException {

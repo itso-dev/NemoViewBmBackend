@@ -17,6 +17,7 @@ public class SEARCH {
     private String searchKeyword;
 
     // 회원
+    private Integer user_member;
     private Integer member;
     private String email;
 
@@ -24,6 +25,7 @@ public class SEARCH {
     private String filter_name;
     private String start_date;
     private String end_date;
+    private Integer state;
 
     public void calStart(){
         this.start = (this.page-1) * this.page_block;

@@ -1,5 +1,6 @@
 package com.jamie.home.api.dao;
 
+import com.jamie.home.api.model.INFO;
 import com.jamie.home.api.model.MEMBER;
 import com.jamie.home.api.model.POINT;
 import com.jamie.home.api.model.SEARCH;

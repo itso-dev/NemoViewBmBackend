@@ -27,6 +27,23 @@ public class AdService extends BasicService {
         return list;
     }
 
+    public List<AD> listForUser(SEARCH search) {
+        List<AD> list = adDao.getListAd(search);
+        if(search.getMember() != null){
+            AD param = new AD();
+            param.setMember(search.getMember());
+            for(int i=0; i<list.size(); i++){
+                param.setAd(list.get(i).getAd());
+                if(adDao.getAdLike(param) > 0){
+                    list.get(i).setLikeYn(true);
+                } else {
+                    list.get(i).setLikeYn(false);
+                }
+            }
+        }
+        return list;
+    }
+
     public Integer listCnt(SEARCH search) {
         return adDao.getListAdCnt(search);
     }
@@ -168,7 +185,12 @@ public class AdService extends BasicService {
     }
 
     public int saveAdLike(AD ad) {
-        return adDao.insertAdLike(ad);
+        if(adDao.getAdLike(ad) > 0){
+            adDao.deleteAdLike(ad);
+        } else {
+            adDao.insertAdLike(ad);
+        }
+        return 1;
     }
 
     public int saveAdHit(AD ad) {

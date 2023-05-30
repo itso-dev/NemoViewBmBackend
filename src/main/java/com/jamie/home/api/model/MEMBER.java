@@ -9,6 +9,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -38,6 +39,7 @@ public class MEMBER {
     private Integer point;
 
     private ArrayList<MultipartFile> tax_file_new;
+    private List<INFO> infoList;
 
     public MEMBER() {}
 
