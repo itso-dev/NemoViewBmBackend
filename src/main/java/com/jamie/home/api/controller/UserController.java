@@ -39,6 +39,23 @@ public class UserController {
         }
     }
 
+    @RequestMapping(value="/ad/list/random", method= RequestMethod.POST)
+    public ResponseOverlays listRandom(@Validated @RequestBody SEARCH search) {
+        try {
+            List<AD> list = adService.listRandom(search);
+
+            if(list != null){
+                VoList<AD> result = new VoList<>(list.size(), list);
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_AD_SUCCESS", result);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_NULL", null);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_FAIL", null);
+        }
+    }
+
     @RequestMapping(value={"/ad/{key}/like"}, method= RequestMethod.POST)
     public ResponseOverlays saveAdLike(@PathVariable("key") int key, @Validated @RequestBody AD ad) {
         try {

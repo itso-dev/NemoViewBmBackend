@@ -14,14 +14,13 @@
             </if>
         </if>
         <if test="searchKeyword == null">
-            <choose>
-                <when test="searchType == 'recommend'.toString()">
-
-                </when>
-                <when test="searchType == 'special'.toString()"></when>
-                <when test="searchType == 'random'.toString()"></when>
-                <when test="searchType == 'new'.toString()"></when>
-            </choose>
+            <if test="searchType != null">
+                <choose>
+                    <when test="searchType == 'special'.toString()"></when>
+                    <when test="searchType == 'random'.toString()"></when>
+                    <when test="searchType == 'new'.toString()"></when>
+                </choose>
+            </if>
         </if>
     </sql>
     <sql id="ListOrder">
@@ -127,7 +126,7 @@
         INSERT INTO BM_AD_HIT (AD, MEMBER) VALUES (#{ad}, #{member})
     </insert>
     <select id="getAdLike" resultType="java.lang.Integer">
-        SELECT count(*) FROM BM_AD_LIKE WHERE AD = #{ad} AND MEMBER = #{member}
+        SELECT COUNT(*) FROM BM_AD_LIKE WHERE AD = #{ad} AND MEMBER = #{member}
     </select>
     <insert id="insertAdLike">
         INSERT INTO BM_AD_LIKE (AD, MEMBER) VALUES (#{ad}, #{member})
@@ -196,6 +195,20 @@
     </select>
 
     <update id="updateAdStateAll">
-        UPDATE BM_AD SET UPDDATE = now(), STATE = 3, STATE_ERROR = '보유 포인트 부족' WHERE MEMBER = #{member}
+        UPDATE BM_AD SET UPDDATE = now(), STATE = 3, STATE_ERROR = '보유 포인트 부족' WHERE MEMBER = #{member} AND STATE NOT IN (0,1)
     </update>
+
+    <select id="getAdListRandom" resultType="com.jamie.home.api.model.AD">
+        SELECT * FROM BM_AD WHERE AD IN (
+            SELECT AD
+            FROM MEMBER_AD
+            WHERE MEMBER = #{user_member}
+                AND REGDATE >= DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')
+                AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59') >= REGDATE
+        )
+    </select>
+
+    <insert id="insertMemberAdValid">
+        CALL INSERT_MEMBER_AD_VALID(#{user_member});
+    </insert>
 </mapper>

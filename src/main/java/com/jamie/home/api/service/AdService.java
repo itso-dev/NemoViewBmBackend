@@ -199,7 +199,7 @@ public class AdService extends BasicService {
         MEMBER ad_member = memberDao.getMember(new MEMBER(ori_ad.getMember()));
         Integer member_point = memberDao.getMemberPoint(ad_member);
 
-        if(member_point <= 0){ // 광고 중지 (보유 포인트 부족)
+        if(member_point == null || member_point <= 0){ // 광고 중지 (보유 포인트 부족)
             adDao.updateAdStateAll(ori_ad);
         } else {
             if(ad.getClick_price() >= member_point){ // 포인트 차감 후 광고 중지 (보유 포인트 부족)
@@ -211,7 +211,9 @@ public class AdService extends BasicService {
         }
 
         Integer re_member_point = memberDao.getMemberPoint(ad_member);
-        if(re_member_point <= 0){
+        if(re_member_point == null){
+
+        } else if(re_member_point <= 0){
             // 알림 TYPE 7
             INFO info = new INFO(ad_member.getMember(),"포인트가 모두 소진되었습니다.");
             infoDao.insertInfo(info);
@@ -221,8 +223,23 @@ public class AdService extends BasicService {
             infoDao.insertInfo(info);
         }
 
-        adDao.insertAdHit(ad);
+        return adDao.insertAdHit(ad);
+    }
 
-        return 1;
+    public List<AD> listRandom(SEARCH search) {
+        adDao.insertMemberAdValid(search); // 진행중 외 광고들 삭제 후 다시 셋팅
+        List<AD> list = adDao.getAdListRandom(search);
+        for(int i=0; i<list.size(); i++){
+            list.get(i).setFilter_name(search.getFilter_name());
+            list.get(i).setStart_date(search.getStart_date());
+            list.get(i).setEnd_date(search.getEnd_date());
+            if(adDao.getAdLike(list.get(i)) == 0){
+                list.get(i).setLikeYn(false);
+            } else {
+                list.get(i).setLikeYn(true);
+            }
+            setDetailInfo(list.get(i));
+        }
+        return list;
     }
 }
