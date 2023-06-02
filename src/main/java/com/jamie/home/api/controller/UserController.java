@@ -24,6 +24,9 @@ public class UserController {
     @RequestMapping(value="/ad/list", method= RequestMethod.POST)
     public ResponseOverlays list(@Validated @RequestBody SEARCH search) {
         try {
+            if(search.getPage() != null && search.getPage_block() != null){
+                search.calStart();
+            }
             List<AD> list = adService.listForUser(search);
 
             if(list != null){

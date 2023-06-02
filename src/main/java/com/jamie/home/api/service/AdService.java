@@ -29,10 +29,12 @@ public class AdService extends BasicService {
 
     public List<AD> listForUser(SEARCH search) {
         List<AD> list = adDao.getListAd(search);
-        if(search.getMember() != null){
+        if(search.getUser_member() != null){
             AD param = new AD();
-            param.setMember(search.getMember());
+            param.setMember(search.getUser_member());
             for(int i=0; i<list.size(); i++){
+                list.get(i).setCommonKeywordList(adDao.getAdCommonKeyword(list.get(i)));
+                list.get(i).setKeywordList(adDao.getAdKeyword(list.get(i)));
                 param.setAd(list.get(i).getAd());
                 if(adDao.getAdLike(param) > 0){
                     list.get(i).setLikeYn(true);
@@ -196,17 +198,28 @@ public class AdService extends BasicService {
     public int saveAdHit(AD ad) {
         // 클릭당 비용 삭감
         AD ori_ad = adDao.getAd(ad);
+        // 오늘 클릭 수 확인
+        ori_ad.setFilter_name("today");
+        setDetailInfo(ori_ad);
         MEMBER ad_member = memberDao.getMember(new MEMBER(ori_ad.getMember()));
         Integer member_point = memberDao.getMemberPoint(ad_member);
 
         if(member_point == null || member_point <= 0){ // 광고 중지 (보유 포인트 부족)
             adDao.updateAdStateAll(ori_ad);
         } else {
-            if(ad.getClick_price() >= member_point){ // 포인트 차감 후 광고 중지 (보유 포인트 부족)
+            if(ori_ad.getClick_price() >= member_point){ // 포인트 차감 후 광고 중지 (보유 포인트 부족)
                 memberDao.insertMemberPoint(new POINT(ad_member.getMember(), member_point*(-1), ori_ad.getTitle() + " 광고 클릭 비용 (보유 포인트 부족)"));
                 adDao.updateAdStateAll(ori_ad);
             } else {
-                memberDao.insertMemberPoint(new POINT(ad_member.getMember(), ad.getClick_price()*(-1), ori_ad.getTitle() + " 광고 클릭 비용"));
+                if(ori_ad.getDay_price() <= (ori_ad.getClick_price() * ori_ad.getHits())){ // 하루예산 초과
+
+                } else {
+                    if(ori_ad.getDay_price() - (ori_ad.getClick_price() * ori_ad.getHits()) >= ori_ad.getClick_price()){
+                        memberDao.insertMemberPoint(new POINT(ad_member.getMember(), ori_ad.getClick_price()*(-1), ori_ad.getTitle() + " 광고 클릭 비용"));
+                    } else {
+                        memberDao.insertMemberPoint(new POINT(ad_member.getMember(), (ori_ad.getDay_price() - (ori_ad.getClick_price() * ori_ad.getHits()))*(-1), ori_ad.getTitle() + " 광고 클릭 비용 (하루 예산 초과)"));
+                    }
+                }
             }
         }
 
@@ -229,16 +242,17 @@ public class AdService extends BasicService {
     public List<AD> listRandom(SEARCH search) {
         adDao.insertMemberAdValid(search); // 진행중 외 광고들 삭제 후 다시 셋팅
         List<AD> list = adDao.getAdListRandom(search);
+        AD param = new AD();
+        param.setMember(search.getUser_member());
         for(int i=0; i<list.size(); i++){
-            list.get(i).setFilter_name(search.getFilter_name());
-            list.get(i).setStart_date(search.getStart_date());
-            list.get(i).setEnd_date(search.getEnd_date());
-            if(adDao.getAdLike(list.get(i)) == 0){
+            list.get(i).setCommonKeywordList(adDao.getAdCommonKeyword(list.get(i)));
+            list.get(i).setKeywordList(adDao.getAdKeyword(list.get(i)));
+            param.setAd(list.get(i).getAd());
+            if(adDao.getAdLike(param) == 0){
                 list.get(i).setLikeYn(false);
             } else {
                 list.get(i).setLikeYn(true);
             }
-            setDetailInfo(list.get(i));
         }
         return list;
     }

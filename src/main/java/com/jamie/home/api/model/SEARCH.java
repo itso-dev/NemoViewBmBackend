@@ -22,6 +22,8 @@ public class SEARCH {
 
     // 광고
     private Integer ad;
+    private Integer type;
+    private Integer category;
     private String filter_name;
     private String start_date;
     private String end_date;
@@ -30,6 +32,7 @@ public class SEARCH {
     // 사용자
     private Integer user_member;
     private Integer member_ad;
+    private Boolean like;
 
     public void calStart(){
         this.start = (this.page-1) * this.page_block;

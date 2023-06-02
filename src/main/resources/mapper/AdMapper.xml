@@ -9,16 +9,40 @@
         <if test="state != null">
             AND STATE = #{state}
         </if>
+        <if test="type != null">
+            AND TYPE = #{type}
+        </if>
+        <if test="category != null">
+            AND CATEGORY = #{category}
+        </if>
+        <if test="like">
+            AND AD IN (SELECT AD FROM BM_AD_LIKE WHERE MEMBER = #{user_member})
+        </if>
         <if test="searchKeyword != null">
             <if test="searchType == 'ad'.toString()">
+            </if>
+            <if test="searchType == null">
+                AND (
+                    MATCH(TITLE) AGAINST (CONCAT(#{searchKeyword},'*') IN BOOLEAN MODE)
+                    OR MATCH(BRAND) AGAINST (CONCAT(#{searchKeyword},'*') IN BOOLEAN MODE)
+                )
             </if>
         </if>
         <if test="searchKeyword == null">
             <if test="searchType != null">
+                AND IS_NOT_OVER_DAY_PRICE(AD)
                 <choose>
-                    <when test="searchType == 'special'.toString()"></when>
+                    <when test="searchType == 'special'.toString()">
+                        AND DISCOUNT != 0
+                    </when>
                     <when test="searchType == 'random'.toString()"></when>
                     <when test="searchType == 'new'.toString()"></when>
+                    <when test="searchType == 'match_keyword_list'.toString()">
+                        AND COUNT_MATCH_KEYWORD_BM_AD(AD, #{user_member}) != 0
+                    </when>
+                    <when test="searchType == 'discount_list'.toString()">
+                        AND DISCOUNT != 0
+                    </when>
                 </choose>
             </if>
         </if>
@@ -27,8 +51,33 @@
         ORDER BY
         <if test="orderType != null">
             <choose>
-                <when test="orderType == 'reg_date_desc'.toString()">REGDATE DESC, </when>
+                <when test="orderType == 'discount_desc'.toString()">DISCOUNT DESC, CLICK_PRICE DESC, </when>
+                <when test="orderType == 'hits_desc'.toString()">(SELECT COUNT(*) FROM BM_AD_HITS WHERE AD = BM_AD.AD) DESC, </when>
+                <when test="orderType == 'match_keyword_desc'.toString()">COUNT_MATCH_KEYWORD_BM_AD(AD, #{user_member}) DESC, </when>
+                <when test="orderType == 'price_desc'.toString()">PRICE DESC, </when>
+                <when test="orderType == 'price_asc'.toString()">PRICE ASC, </when>
             </choose>
+        </if>
+        <if test="searchKeyword == null">
+            <if test="searchType != null">
+                <choose>
+                    <when test="searchType == 'special'.toString()">
+                        RAND(), CLICK_PRICE DESC,
+                    </when>
+                    <when test="searchType == 'random'.toString()">
+                        RAND(), CLICK_PRICE DESC,
+                    </when>
+                    <when test="searchType == 'new'.toString()">
+                        REGDATE DESC,
+                    </when>
+                    <when test="searchType == 'match_keyword_list'.toString()">
+                        COUNT_MATCH_KEYWORD_BM_AD(AD, #{user_member}) DESC, CLICK_PRICE DESC,
+                    </when>
+                    <when test="searchType == 'discount_list'.toString()">
+
+                    </when>
+                </choose>
+            </if>
         </if>
         AD DESC
     </sql>
@@ -87,7 +136,7 @@
         DELETE FROM BM_AD WHERE AD = #{ad}
     </delete>
     <select id="getAdCommonKeyword" resultType="com.jamie.home.api.model.KEYWORD">
-        SELECT BACK.*, CK.NAME AS NAME
+        SELECT BACK.*, CK.NAME AS NAME, CK.CATEGORY AS CATEGORY
         FROM BM_AD_COMMON_KEYWORD BACK
             LEFT JOIN COMMON_KEYWORD CK ON CK.COMMON_KEYWORD = BACK.COMMON_KEYWORD
         WHERE AD = #{ad}
