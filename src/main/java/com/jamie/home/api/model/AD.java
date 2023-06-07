@@ -47,4 +47,7 @@ public class AD {
     private String end_date;
 
     private Boolean likeYn;
+    private Boolean isOver;
+    private Integer left_price;
+    private MEMBER member_info;
 }

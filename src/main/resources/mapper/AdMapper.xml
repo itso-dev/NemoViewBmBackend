@@ -18,8 +18,19 @@
         <if test="like">
             AND AD IN (SELECT AD FROM BM_AD_LIKE WHERE MEMBER = #{user_member})
         </if>
+        <if test="showYn">
+            AND (STATE IN (3,4) OR (STATE = 2 AND !IS_NOT_OVER_DAY_PRICE(AD)))
+        </if>
         <if test="searchKeyword != null">
             <if test="searchType == 'ad'.toString()">
+                AND AD LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchType == 'name'.toString()">
+                AND (
+                    MEMBER IN (SELECT MEMBER FROM BM_MEMBER WHERE NAME LIKE CONCAT('%',#{searchKeyword},'%'))
+                    OR
+                    MEMBER IN (SELECT MEMBER FROM BM_MEMBER WHERE COMPANY LIKE CONCAT('%',#{searchKeyword},'%'))
+                )
             </if>
             <if test="searchType == null">
                 AND (
@@ -56,6 +67,9 @@
                 <when test="orderType == 'match_keyword_desc'.toString()">COUNT_MATCH_KEYWORD_BM_AD(AD, #{user_member}) DESC, </when>
                 <when test="orderType == 'price_desc'.toString()">PRICE DESC, </when>
                 <when test="orderType == 'price_asc'.toString()">PRICE ASC, </when>
+                <when test="orderType == 'click_price_desc'.toString()">CLICK_PRICE DESC, </when>
+                <when test="orderType == 'ctr_desc'.toString()">((SELECT COUNT(*) FROM BM_AD_HIT WHERE AD = BM_AD.AD)/(SELECT COUNT(*) FROM BM_AD_SHOW WHERE AD = BM_AD.AD)*100) DESC, </when>
+                <when test="orderType == 'today_low_cost_asc'.toString()">CAL_TODAY_LEFT_PRICE(AD) ASC, </when>
             </choose>
         </if>
         <if test="searchKeyword == null">
@@ -260,4 +274,16 @@
     <insert id="insertMemberAdValid">
         CALL INSERT_MEMBER_AD_VALID(#{user_member});
     </insert>
+
+    <insert id="insertAdShow">
+        INSERT INTO BM_AD_SHOW (AD) VALUES (#{ad})
+    </insert>
+
+    <select id="getIsNotOverTodayPrice" resultType="java.lang.Boolean">
+        SELECT IS_NOT_OVER_DAY_PRICE(AD) FROM BM_AD WHERE AD = #{ad}
+    </select>
+
+    <select id="getTodayLeftDayPrice" resultType="java.lang.Integer">
+        SELECT CAL_TODAY_LEFT_PRICE(AD) FROM BM_AD WHERE AD = #{ad}
+    </select>
 </mapper>

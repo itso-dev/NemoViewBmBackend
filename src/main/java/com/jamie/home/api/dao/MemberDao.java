@@ -23,4 +23,8 @@ public interface MemberDao {
     Integer insertMemberPoint(POINT point);
 
     Integer getMemberPoint(MEMBER member);
+
+    void updateLogDate(MEMBER member);
+
+    Integer getMemberAdCnt(MEMBER member);
 }

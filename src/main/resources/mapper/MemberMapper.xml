@@ -5,6 +5,10 @@
     <sql id="memberList">
         <if test="searchKeyword != null">
             <if test="searchType == 'member'.toString()">
+                AND MEMBER LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchType == 'name'.toString()">
+                AND NAME LIKE CONCAT('%',#{searchKeyword},'%')
             </if>
         </if>
     </sql>
@@ -13,6 +17,9 @@
         <if test="orderType != null">
             <choose>
                 <when test="orderType == 'reg_date_desc'.toString()">REGDATE DESC, </when>
+                <when test="orderType == 'log_date_desc'.toString()">LOGDATE DESC, </when>
+                <when test="orderType == 'point_asc'.toString()">(SELECT SUM(POINT) FROM BM_MEMBER_POINT WHERE MEMBER = BM_MEMBER.MEMBER) ASC, </when>
+                <when test="orderType == 'have_ad_desc'.toString()">(SELECT COUNT(*) FROM BM_AD WHERE MEMBER = BM_MEMBER.MEMBER) DESC, </when>
             </choose>
         </if>
         MEMBER DESC
@@ -102,4 +109,12 @@
     <insert id="insertMemberPoint">
         INSERT INTO BM_MEMBER_POINT (MEMBER, POINT, CONTENT) VALUES (#{member}, #{point}, #{content})
     </insert>
+
+    <update id="updateLogDate">
+        UPDATE BM_MEMBER SET LOGDATE = now() WHERE MEMBER = #{member}
+    </update>
+
+    <select id="getMemberAdCnt" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BM_AD WHERE MEMBER = #{member}
+    </select>
 </mapper>

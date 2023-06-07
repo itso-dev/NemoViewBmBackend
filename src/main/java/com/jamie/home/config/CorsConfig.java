@@ -18,10 +18,12 @@ public class CorsConfig {
       config.addAllowedHeader("*");
       config.addAllowedMethod("*");
 
+      source.registerCorsConfiguration("/file/**", config);
       source.registerCorsConfiguration("/member/**", config);
       source.registerCorsConfiguration("/service/**", config);
       source.registerCorsConfiguration("/ad/**", config);
       source.registerCorsConfiguration("/user/**", config);
+      source.registerCorsConfiguration("/admin/**", config);
       return new CorsFilter(source);
    }
 

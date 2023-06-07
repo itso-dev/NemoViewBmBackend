@@ -32,6 +32,7 @@ public class AdService extends BasicService {
             AD param = new AD();
             param.setMember(search.getUser_member());
             for(int i=0; i<list.size(); i++){
+                adDao.insertAdShow(list.get(i));
                 list.get(i).setCommonKeywordList(adDao.getAdCommonKeyword(list.get(i)));
                 list.get(i).setKeywordList(adDao.getAdKeyword(list.get(i)));
                 param.setAd(list.get(i).getAd());
@@ -40,6 +41,30 @@ public class AdService extends BasicService {
                 } else {
                     list.get(i).setLikeYn(false);
                 }
+            }
+        }
+        return list;
+    }
+
+    public List<AD> listForAdmin(SEARCH search) {
+        List<AD> list = adDao.getListAd(search);
+        MEMBER param = null;
+        for(int i=0; i<list.size(); i++){
+            list.get(i).setIsOver(!adDao.getIsNotOverTodayPrice(list.get(i)));
+            if(search.getMember() != null){ // 광고주 상세
+                list.get(i).setShows(adDao.getListAdShowCnt(list.get(i)));
+                list.get(i).setHits(adDao.getListClickMemberCnt(list.get(i)));
+            } else { // 광고 리스트
+                list.get(i).setShows(adDao.getListAdShowCnt(list.get(i)));
+                list.get(i).setHits(adDao.getListClickMemberCnt(list.get(i)));
+                //setDetailInfo(list.get(i));
+                list.get(i).setLeft_price(adDao.getTodayLeftDayPrice(list.get(i)));
+                if(list.get(i).getLeft_price() < 0){
+                    list.get(i).setLeft_price(0);
+                }
+                list.get(i).setMember_info(new MEMBER(list.get(i).getMember()));
+                list.get(i).setMember_info(memberDao.getMember(list.get(i).getMember_info()));
+                list.get(i).getMember_info().setPoint(memberDao.getMemberPoint(list.get(i).getMember_info()));
             }
         }
         return list;
@@ -244,6 +269,7 @@ public class AdService extends BasicService {
         AD param = new AD();
         param.setMember(search.getUser_member());
         for(int i=0; i<list.size(); i++){
+            adDao.insertAdShow(list.get(i));
             list.get(i).setCommonKeywordList(adDao.getAdCommonKeyword(list.get(i)));
             list.get(i).setKeywordList(adDao.getAdKeyword(list.get(i)));
             param.setAd(list.get(i).getAd());

@@ -32,11 +32,13 @@ public class MEMBER {
     private Boolean info_email;
     @Enumerated(EnumType.STRING)
     private ROLE role;
+    private Date logdate;
     private Date regdate;
     private Date upddate;
 
     private String code;
     private Integer point;
+    private Integer adCnt;
 
     private ArrayList<MultipartFile> tax_file_new;
     private List<INFO> infoList;

@@ -16,6 +16,19 @@ public class MemberService extends BasicService{
         return memberDao.getListMember(search);
     }
 
+    public List<MEMBER> listForAdmin(SEARCH search) {
+        List<MEMBER> list = memberDao.getListMember(search);
+        for(int i=0; i<list.size(); i++){
+            setDetailInfoForAdmin(list.get(i));
+        }
+        return list;
+    }
+
+    private void setDetailInfoForAdmin(MEMBER member){
+        member.setPoint(memberDao.getMemberPoint(member));
+        member.setAdCnt(memberDao.getMemberAdCnt(member));
+    }
+
     public Integer listCnt(SEARCH search) {
         return memberDao.getListMemberCnt(search);
     }
@@ -23,6 +36,12 @@ public class MemberService extends BasicService{
     public MEMBER get(MEMBER member){
         MEMBER result = memberDao.getMember(member);
         setDetailInfo(result);
+        return result;
+    }
+
+    public MEMBER getForAdmin(MEMBER member){
+        MEMBER result = memberDao.getMember(member);
+        setDetailInfoForAdmin(result);
         return result;
     }
 
@@ -84,5 +103,9 @@ public class MemberService extends BasicService{
             infoDao.insertInfo(info);
         }
         return memberDao.insertMemberPoint(point);
+    }
+
+    public void modifyLogDate(MEMBER member) {
+        memberDao.updateLogDate(member);
     }
 }

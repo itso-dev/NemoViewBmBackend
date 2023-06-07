@@ -34,6 +34,9 @@ public class SEARCH {
     private Integer member_ad;
     private Boolean like;
 
+    // 관리자
+    private Boolean showYn;
+
     public void calStart(){
         this.start = (this.page-1) * this.page_block;
     }

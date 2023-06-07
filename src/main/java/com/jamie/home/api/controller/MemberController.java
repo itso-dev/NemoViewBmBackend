@@ -141,6 +141,7 @@ public class MemberController {
             httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
             MEMBER result = memberService.getByParam(member);
             if(jwt != null){
+                memberService.modifyLogDate(result);
                 token = new TOKEN(result, jwt, (expirySec/3600.0));
                 return new ResponseOverlays(HttpServletResponse.SC_OK, "LOGIN_MEMBER_SUCCESS", token);
             } else {

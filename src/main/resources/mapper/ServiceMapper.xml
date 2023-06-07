@@ -3,8 +3,15 @@
 
 <mapper namespace="com.jamie.home.api.dao.ServiceDao">
     <sql id="List">
+        <if test="state != null">
+            AND STATE = #{state}
+        </if>
         <if test="searchKeyword != null">
-            <if test="searchType == 'service'.toString()">
+            <if test="searchType == 'title'.toString()">
+                AND TITLE LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchType == 'content'.toString()">
+                AND CONTENT LIKE CONCAT('%',#{searchKeyword},'%')
             </if>
         </if>
     </sql>
@@ -43,9 +50,9 @@
 
     <insert id="insertService" parameterType="com.jamie.home.api.model.SERVICE" useGeneratedKeys="true" keyProperty="service">
         INSERT INTO BM_SERVICE (
-            TITLE, CONTENT, LINK
+            TITLE, CONTENT, LINK, IMAGE, SEQ, STATE
         ) VALUES (
-            #{title}, #{content}, #{link}
+            #{title}, #{content}, #{link}, #{image}, #{seq}, #{state}
         )
     </insert>
 
@@ -54,6 +61,9 @@
         <if test="title != null">,TITLE = #{title}</if>
         <if test="content != null">,CONTENT = #{content}</if>
         <if test="link != null">,LINK = #{link}</if>
+        <if test="image != null">,IMAGE = #{image}</if>
+        <if test="seq != null">,SEQ = #{seq}</if>
+        <if test="state != null">,STATE = #{state}</if>
         WHERE SERVICE = #{service}
     </update>
     <delete id="deleteService">

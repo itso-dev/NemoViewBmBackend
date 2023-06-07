@@ -35,4 +35,10 @@ public interface AdDao {
     void updateAdStateAll(AD ad);
     List<AD> getAdListRandom(SEARCH search);
     void insertMemberAdValid(SEARCH search);
+
+    void insertAdShow(AD ad);
+
+    Boolean getIsNotOverTodayPrice(AD ad);
+
+    Integer getTodayLeftDayPrice(AD ad);
 }

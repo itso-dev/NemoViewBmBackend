@@ -57,35 +57,4 @@ public class ServiceController {
             return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_SERVICE_FAIL", false);
         }
     }
-
-    @RequestMapping(value="/save", method= RequestMethod.POST)
-    public ResponseOverlays save(@Validated @RequestBody SERVICE service) {
-        try {
-            int result = serviceService.save(service);
-            if(result == 0){
-                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_SERVICE_NOT_SAVE", false);
-            } else {
-                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_SERVICE_SUCCESS", true);
-            }
-        } catch (Exception e){
-            logger.error(e.getLocalizedMessage());
-            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_SERVICE_FAIL", false);
-        }
-    }
-
-    @RequestMapping(value={"/{key}"}, method= RequestMethod.PUT)
-    public ResponseOverlays modify(@PathVariable("key") int key, @Validated @RequestBody SERVICE service) {
-        try {
-            service.setService(key);
-            int result = serviceService.modify(service);
-            if(result == 0){
-                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_SERVICE_NOT_SAVE", false);
-            } else {
-                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_SERVICE_SUCCESS", true);
-            }
-        } catch (Exception e){
-            logger.error(e.getLocalizedMessage());
-            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_SERVICE_FAIL", false);
-        }
-    }
 }
