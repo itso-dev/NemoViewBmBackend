@@ -8,6 +8,7 @@ import com.jamie.home.api.service.MailService;
 import com.jamie.home.api.service.MemberService;
 import com.jamie.home.jwt.JwtFilter;
 import com.jamie.home.jwt.TokenProvider;
+import com.jamie.home.util.CodeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -182,6 +183,25 @@ public class MemberController {
         } catch (Exception e){
             logger.error(e.getLocalizedMessage());
             return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_MEMBER_FAIL", false);
+        }
+    }
+
+    @RequestMapping(value="/find/password", method= RequestMethod.POST)
+    public ResponseOverlays find(@Validated @RequestBody MEMBER member) {
+        try {
+            MEMBER result = memberService.getByParam(member);
+            if(result != null){
+                String newPassword = CodeUtils.getCodeValue();
+                result.setPassword(newPassword);
+                memberService.modify(result);
+                mailService.sendMailPassword(result, newPassword);
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_MEMBER_SUCCESS", true);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_MEMBER_NULL", false);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_MEMBER_FAIL", false);
         }
     }
 }

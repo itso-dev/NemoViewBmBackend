@@ -1,8 +1,10 @@
 package com.jamie.home.api.controller;
 
-import com.jamie.home.api.model.*;
+import com.jamie.home.api.model.AD;
+import com.jamie.home.api.model.ResponseOverlays;
+import com.jamie.home.api.model.SEARCH;
+import com.jamie.home.api.model.VoList;
 import com.jamie.home.api.service.AdService;
-import com.jamie.home.api.service.ServiceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

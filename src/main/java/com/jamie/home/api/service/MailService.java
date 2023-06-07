@@ -22,4 +22,17 @@ public class MailService extends BasicService{
         msgHelper.setText(htmlContent, true);
         javaMailSender.send(message);
     }
+
+    public void sendMailPassword(MEMBER member, String code) throws Exception {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper msgHelper = new MimeMessageHelper(message, true, "UTF-8");
+        // 수신 대상
+        msgHelper.setTo(member.getEmail());
+        msgHelper.setFrom("sender@gmail.com");
+
+        msgHelper.setSubject("[네모뷰] 비밀번호 초기화");
+        String htmlContent = "초기화 된 비밀번호["+code+"]를 입력해주시기 바랍니다.<br>";
+        msgHelper.setText(htmlContent, true);
+        javaMailSender.send(message);
+    }
 }
