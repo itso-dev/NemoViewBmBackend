@@ -232,16 +232,16 @@ public class AdService extends BasicService {
             adDao.updateAdStateAll(ori_ad);
         } else {
             if(ori_ad.getClick_price() >= member_point){ // 포인트 차감 후 광고 중지 (보유 포인트 부족)
-                memberDao.insertMemberPoint(new POINT(ad_member.getMember(), member_point*(-1), ori_ad.getTitle() + " 광고 클릭 비용 (보유 포인트 부족)"));
+                memberDao.insertMemberPoint(new POINT(ad_member.getMember(), 1, member_point*(-1), ori_ad.getTitle() + " 광고 클릭 비용 (보유 포인트 부족)"));
                 adDao.updateAdStateAll(ori_ad);
             } else {
                 if(ori_ad.getDay_price() <= (ori_ad.getClick_price() * ori_ad.getHits())){ // 하루예산 초과
 
                 } else {
                     if(ori_ad.getDay_price() - (ori_ad.getClick_price() * ori_ad.getHits()) >= ori_ad.getClick_price()){
-                        memberDao.insertMemberPoint(new POINT(ad_member.getMember(), ori_ad.getClick_price()*(-1), ori_ad.getTitle() + " 광고 클릭 비용"));
+                        memberDao.insertMemberPoint(new POINT(ad_member.getMember(), 1, ori_ad.getClick_price()*(-1), ori_ad.getTitle() + " 광고 클릭 비용"));
                     } else {
-                        memberDao.insertMemberPoint(new POINT(ad_member.getMember(), (ori_ad.getDay_price() - (ori_ad.getClick_price() * ori_ad.getHits()))*(-1), ori_ad.getTitle() + " 광고 클릭 비용 (하루 예산 초과)"));
+                        memberDao.insertMemberPoint(new POINT(ad_member.getMember(), 1, (ori_ad.getDay_price() - (ori_ad.getClick_price() * ori_ad.getHits()))*(-1), ori_ad.getTitle() + " 광고 클릭 비용 (하루 예산 초과)"));
                     }
                 }
             }

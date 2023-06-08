@@ -107,7 +107,7 @@
     </insert>
 
     <insert id="insertMemberPoint">
-        INSERT INTO BM_MEMBER_POINT (MEMBER, POINT, CONTENT) VALUES (#{member}, #{point}, #{content})
+        INSERT INTO BM_MEMBER_POINT (MEMBER, TYPE, POINT, CONTENT) VALUES (#{member}, #{type}, #{point}, #{content})
     </insert>
 
     <update id="updateLogDate">

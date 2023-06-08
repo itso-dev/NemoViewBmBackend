@@ -171,22 +171,6 @@ public class MemberController {
         }
     }
 
-    @RequestMapping(value="/{key}/point", method= RequestMethod.PUT)
-    public ResponseOverlays modifyPoint(@PathVariable("key") int key, @Validated @RequestBody POINT point) {
-        try {
-            point.setMember(key);
-            int result = memberService.modifyPoint(point);
-            if(result == 0){
-                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_MEMBER_NOT_SAVE", false);
-            } else {
-                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_MEMBER_SUCCESS", true);
-            }
-        } catch (Exception e){
-            logger.error(e.getLocalizedMessage());
-            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_MEMBER_FAIL", false);
-        }
-    }
-
     @RequestMapping(value="/find/password", method= RequestMethod.POST)
     public ResponseOverlays find(@Validated @RequestBody MEMBER member) {
         try {
