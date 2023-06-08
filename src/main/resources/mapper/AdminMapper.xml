@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jamie.home.api.dao.AdminDao">
+    <sql id="periodSql">
+        <if test="filter_name != null">
+            <choose>
+                <when test="filter_name == 'today'.toString()">
+                    AND REGDATE >= DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')
+                    AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59') >= REGDATE
+                </when>
+                <when test="filter_name == 'yesterday'.toString()">
+                    AND REGDATE >= DATE_FORMAT(NOW() - interval 1 day, '%Y-%m-%d 00:00:00')
+                    AND DATE_FORMAT(NOW() - interval 1 day, '%Y-%m-%d 23:59:59') >= REGDATE
+                </when>
+                <when test="filter_name == 'last7'.toString()">
+                    AND REGDATE >= DATE_FORMAT(NOW() - interval 7 day, '%Y-%m-%d 00:00:00')
+                    AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59') >= REGDATE
+                </when>
+                <when test="filter_name == 'last30'.toString()">
+                    AND REGDATE >= DATE_FORMAT(NOW() - interval 1 month, '%Y-%m-%d 00:00:00')
+                    AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59') >= REGDATE
+                </when>
+                <when test="filter_name == 'last90'.toString()">
+                    AND REGDATE >= DATE_FORMAT(NOW() - interval 3 month, '%Y-%m-%d 00:00:00')
+                    AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59') >= REGDATE
+                </when>
+                <when test="filter_name == 'last180'.toString()">
+                    AND REGDATE >= DATE_FORMAT(NOW() - interval 6 month, '%Y-%m-%d 00:00:00')
+                    AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59') >= REGDATE
+                </when>
+                <when test="filter_name == 'custom'.toString()">
+                    AND REGDATE >= CONCAT(#{start_date},' 00:00:00') AND CONCAT(#{end_date},' 23:59:59') >= REGDATE
+                </when>
+            </choose>
+        </if>
+    </sql>
+
+    <select id="getMemberCnt" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BM_MEMBER WHERE 1=1
+        <include refid="periodSql"></include>
+    </select>
+
+    <select id="getMemberPoint" resultType="java.lang.Integer">
+        SELECT IFNULL(SUM(POINT),0) FROM BM_MEMBER_POINT WHERE 1=1 AND TYPE = 2 AND POINT > 0
+        <include refid="periodSql"></include>
+    </select>
+
+    <select id="getCategoryRank" resultType="com.jamie.home.api.model.CATEGORY">
+        SELECT
+            CATEGORY AS `KEY`, COUNT(CATEGORY) AS CNT
+        FROM BM_AD
+        WHERE 1=1
+            AND TYPE = #{type}
+        GROUP BY CATEGORY
+        ORDER BY COUNT(CATEGORY) DESC
+        LIMIT 0,10
+    </select>
+
+    <select id="getCommonKeywordRank" resultType="com.jamie.home.api.model.KEYWORD">
+        SELECT
+            BACK.COMMON_KEYWORD, COUNT(BACK.COMMON_KEYWORD) AS CNT, CK.NAME
+        FROM BM_AD_COMMON_KEYWORD BACK
+            LEFT JOIN COMMON_KEYWORD CK on BACK.COMMON_KEYWORD = CK.COMMON_KEYWORD
+        GROUP BY BACK.COMMON_KEYWORD
+        ORDER BY COUNT(BACK.COMMON_KEYWORD) DESC
+        LIMIT 0,10
+    </select>
+
+    <select id="getKeywordRank" resultType="com.jamie.home.api.model.KEYWORD">
+        SELECT BAK.KEYWORD, COUNT(BAK.KEYWORD) AS CNT, CK.NAME
+        FROM BM_AD_KEYWORD BAK
+            LEFT JOIN CATEGORY_KEYWORD CK on BAK.KEYWORD = CK.KEYWORD
+        GROUP BY BAK.KEYWORD
+        ORDER BY COUNT(BAK.KEYWORD) DESC
+        LIMIT 0,10
+    </select>
+</mapper>

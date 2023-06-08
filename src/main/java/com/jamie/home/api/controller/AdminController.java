@@ -29,6 +29,21 @@ public class AdminController {
     @Autowired
     private MemberService memberService;
 
+    @RequestMapping(value="/dashInfo", method= RequestMethod.POST)
+    public ResponseOverlays getDashInfo(@Validated @RequestBody SEARCH search) {
+        try {
+            DASH result = memberService.getDashInfo(search);
+            if(result != null){
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_DASH_SUCCESS", result);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_DASH_NULL", false);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_DASH_FAIL", false);
+        }
+    }
+
     @RequestMapping(value="/service/list", method= RequestMethod.POST)
     public ResponseOverlays list(@Validated @RequestBody SEARCH search) {
         try {
@@ -191,6 +206,62 @@ public class AdminController {
             AD ad = new AD();
             ad.setAd(key);
             AD result = adService.get(ad);
+            if(result != null){
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_AD_SUCCESS", result);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_NULL", false);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_FAIL", false);
+        }
+    }
+
+    @RequestMapping(value="/ad/{key}/{filter_name}/{start_date}/{end_date}", method= RequestMethod.GET)
+    public ResponseOverlays getDetail(@PathVariable("key") int key,
+                                      @PathVariable("filter_name") String filter_name,
+                                      @PathVariable("start_date") String start_date,
+                                      @PathVariable("end_date") String end_date) {
+        try {
+            AD ad = new AD();
+            ad.setAd(key);
+            ad.setFilter_name(filter_name);
+            ad.setStart_date(start_date);
+            ad.setEnd_date(end_date);
+            AD result = adService.getForAdmin(ad);
+            if(result != null){
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_AD_SUCCESS", result);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_NULL", false);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_FAIL", false);
+        }
+    }
+
+    @RequestMapping(value="/ad/{key}/state", method= RequestMethod.PUT)
+    public ResponseOverlays modifyState(@PathVariable("key") int key, @Validated @RequestBody AD ad) {
+        try {
+            ad.setAd(key);
+            int result = adService.modifyState(ad);
+            if(result == 0){
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_AD_NOT_SAVE", false);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_AD_SUCCESS", true);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_AD_FAIL", false);
+        }
+    }
+
+    @RequestMapping(value="/ad/{key}/click/member/keyword", method= RequestMethod.GET)
+    public ResponseOverlays getClickMemberKeyword(@PathVariable("key") int key) {
+        try {
+            AD ad = new AD();
+            ad.setAd(key);
+            List<KEYWORD> result = adService.getClickMemberKeyword(ad);
             if(result != null){
                 return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_AD_SUCCESS", result);
             } else {

@@ -218,7 +218,7 @@
                     AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59') >= REGDATE
                 </when>
                 <when test="filter_name == 'custom'.toString()">
-                    AND REGDATE >= #{start_date} AND #{end_date} >= REGDATE
+                    AND REGDATE >= CONCAT(#{start_date},' 00:00:00') AND CONCAT(#{end_date},' 23:59:59') >= REGDATE
                 </when>
             </choose>
         </if>

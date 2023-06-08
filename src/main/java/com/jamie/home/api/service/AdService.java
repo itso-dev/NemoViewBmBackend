@@ -74,6 +74,23 @@ public class AdService extends BasicService {
         return adDao.getListAdCnt(search);
     }
 
+    public AD getForAdmin(AD ad){
+        AD result = adDao.getAd(ad);
+        result.setFilter_name(ad.getFilter_name());
+        result.setStart_date(ad.getStart_date());
+        result.setEnd_date(ad.getEnd_date());
+        result.setIsOver(!adDao.getIsNotOverTodayPrice(result));
+        setDetailInfo(result);
+        result.setLeft_price(adDao.getTodayLeftDayPrice(result));
+        if(result.getLeft_price() < 0){
+            result.setLeft_price(0);
+        }
+        result.setMember_info(new MEMBER(result.getMember()));
+        result.setMember_info(memberDao.getMember(result.getMember_info()));
+        result.getMember_info().setPoint(memberDao.getMemberPoint(result.getMember_info()));
+        return result;
+    }
+
     public AD get(AD ad){
         AD result = adDao.getAd(ad);
         result.setFilter_name(ad.getFilter_name());
@@ -166,29 +183,29 @@ public class AdService extends BasicService {
         // 0: 임시저장(광고셋팅중), 1: 저장완료(검수중), 2: 검수완료(진행중), 3: 광고중지 (STATE_ERROR 수정), 4: 광고반려
         if(ori_ad.getState() == 0 && ad.getState() == 1){
             // 알림 TYPE 1
-            INFO info = new INFO(ad.getMember(),ori_ad.getTitle()+" 광고가 검수 작업에 들어갔습니다.");
+            INFO info = new INFO(ori_ad.getMember(),ori_ad.getTitle()+" 광고가 검수 작업에 들어갔습니다.");
             infoDao.insertInfo(info);
         } else if(ori_ad.getState() == 1 && ad.getState() == 2){
             // 알림 TYPE 2
-            INFO info = new INFO(ad.getMember(),ori_ad.getTitle()+" 광고가 검수 완료하였습니다.");
+            INFO info = new INFO(ori_ad.getMember(),ori_ad.getTitle()+" 광고가 검수 완료하였습니다.");
             infoDao.insertInfo(info);
             MEMBER member = new MEMBER();
-            member.setMember(ad.getMember());
+            member.setMember(ori_ad.getMember());
             if(memberDao.getMemberPoint(member) <= 0){
                 ad.setState(3);
                 ad.setState_error("보유 포인트 부족");
             }
         } else if(ori_ad.getState() == 1 && ad.getState() == 4){
             // 알림 TYPE 5
-            INFO info = new INFO(ad.getMember(),ori_ad.getTitle()+" 광고가 반려되었습니다.");
+            INFO info = new INFO(ori_ad.getMember(),ori_ad.getTitle()+" 광고가 반려되었습니다.");
             infoDao.insertInfo(info);
         } else if(ori_ad.getState() == 2 && ad.getState() == 3){ // 광고 중지
             // 알림 TYPE 3
-            INFO info = new INFO(ad.getMember(),ori_ad.getTitle()+" 광고가 중지 되었습니다.\n재개를 원하실 경우 광고 페이지에서 재설정해주세요!");
+            INFO info = new INFO(ori_ad.getMember(),ori_ad.getTitle()+" 광고가 중지 되었습니다.\n재개를 원하실 경우 광고 페이지에서 재설정해주세요!");
             infoDao.insertInfo(info);
         } else if(ori_ad.getState() == 3 && ad.getState() == 2){ // 광고 재개
             // 알림 TYPE 4
-            INFO info = new INFO(ad.getMember(),ori_ad.getTitle()+" 광고가 다시 게시되었습니다.");
+            INFO info = new INFO(ori_ad.getMember(),ori_ad.getTitle()+" 광고가 다시 게시되었습니다.");
             infoDao.insertInfo(info);
         }
         return adDao.updateAd(ad);
