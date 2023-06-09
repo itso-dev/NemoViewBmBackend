@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jamie.home.api.dao.PointDao">
+    <sql id="List">
+        <if test="type != null">
+            <if test="type == 0">
+                AND TYPE != 1
+            </if>
+            <if test="type != 0">
+                AND TYPE = #{type}
+            </if>
+        </if>
+        <if test="searchKeyword != null">
+            <if test="searchType == 'name'.toString()">
+                AND MEMBER IN (SELECT MEMBER FROM BM_MEMBER WHERE NAME LIKE CONCAT('%',#{searchKeyword},'%'))
+            </if>
+            <if test="searchType == 'email'.toString()">
+                AND MEMBER IN (SELECT MEMBER FROM BM_MEMBER WHERE EMAIL LIKE CONCAT('%',#{searchKeyword},'%'))
+            </if>
+        </if>
+    </sql>
+    <sql id="ListOrder">
+        ORDER BY
+        <if test="orderType != null">
+            <choose>
+                <when test="orderType == 'reg_date_desc'.toString()">REGDATE DESC, </when>
+            </choose>
+        </if>
+        MEMBER_POINT DESC
+    </sql>
+    <select id="getListPoint" resultType="com.jamie.home.api.model.POINT">
+        SELECT *
+        FROM BM_MEMBER_POINT
+        WHERE 1=1
+        <include refid="List"></include>
+        <include refid="ListOrder"></include>
+        <if test="start != null">
+            LIMIT #{start}, #{page_block}
+        </if>
+    </select>
+
+    <select id="getListPointCnt" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM BM_MEMBER_POINT
+        WHERE 1=1
+        <include refid="List"></include>
+    </select>
+
+    <select id="getPoint" resultType="com.jamie.home.api.model.POINT">
+        SELECT *
+        FROM BM_MEMBER_POINT
+        WHERE MEMBER_POINT = #{member_point}
+    </select>
+
+    <insert id="insertPoint" parameterType="com.jamie.home.api.model.POINT" useGeneratedKeys="true" keyProperty="member_point">
+        INSERT INTO BM_MEMBER_POINT (
+            MEMBER, TYPE, POINT, ACCUMULATE, CONTENT
+        <if test="bank != null">,BANK</if>
+        <if test="account != null">,ACCOUNT</if>
+        ) VALUES (
+            #{member}, #{type}, #{point}, #{accumulate}, #{content}
+        <if test="bank != null">,#{bank}</if>
+        <if test="account != null">,#{account}</if>
+        )
+    </insert>
+
+    <update id="updatePoint">
+        UPDATE BM_MEMBER_POINT SET UPDDATE = now()
+        <if test="type != null">,TYPE = #{type}</if>
+        <if test="accumulate != null">,ACCUMULATE = #{accumulate}</if>
+        <if test="content != null">,CONTENT = #{content}</if>
+        WHERE MEMBER_POINT = #{member_point}
+    </update>
+
+    <delete id="deletePoint">
+        DELETE FROM BM_MEMBER_POINT WHERE MEMBER_POINT = #{member_point}
+    </delete>
+
+    <select id="getPointTot" resultType="java.lang.Integer">
+        SELECT SUM(POINT) FROM BM_MEMBER_POINT WHERE TYPE = #{type}
+    </select>
+
+    <select id="getPointCnt" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM BM_MEMBER_POINT WHERE TYPE = #{type}
+    </select>
+</mapper>

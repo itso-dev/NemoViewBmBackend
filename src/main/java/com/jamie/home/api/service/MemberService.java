@@ -96,11 +96,19 @@ public class MemberService extends BasicService{
         return result;
     }
 
-    public Integer modifyPoint(POINT point) {
-        if(point.getPoint() > 0){ // 충전
+    public Integer modifyMemberPoint(POINT point) throws Exception {
+        int member_point = memberDao.getMemberPoint(new MEMBER(point.getMember()));
+        point.setAccumulate(member_point + point.getPoint());
+        if(point.getType() == 2){ // 충전
             // 알림 TYPE 6
             INFO info = new INFO(point.getMember(),"포인트 "+point.getPoint()+"P 충전되셨습니다.");
             infoDao.insertInfo(info);
+        } else if(point.getType() == 3){ // 환불 요청
+            if(member_point < point.getPoint()*(-1)){
+                throw new Exception("환불 요청 포인트 부족");
+            }
+        } else {
+            throw new Exception("타입 컬럼 없음");
         }
         return memberDao.insertMemberPoint(point);
     }

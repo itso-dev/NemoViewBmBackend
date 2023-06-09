@@ -3,6 +3,7 @@ package com.jamie.home.api.controller;
 import com.jamie.home.api.model.*;
 import com.jamie.home.api.service.AdService;
 import com.jamie.home.api.service.MemberService;
+import com.jamie.home.api.service.PointService;
 import com.jamie.home.api.service.ServiceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/*")
@@ -28,6 +30,9 @@ public class AdminController {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private PointService pointService;
 
     @RequestMapping(value="/dashInfo", method= RequestMethod.POST)
     public ResponseOverlays getDashInfo(@Validated @RequestBody SEARCH search) {
@@ -166,10 +171,10 @@ public class AdminController {
     }
 
     @RequestMapping(value="/member/{key}/point", method= RequestMethod.PUT)
-    public ResponseOverlays modifyPoint(@PathVariable("key") int key, @Validated @RequestBody POINT point) {
+    public ResponseOverlays modifyMemberPoint(@PathVariable("key") int key, @Validated @RequestBody POINT point) {
         try {
             point.setMember(key);
-            int result = memberService.modifyPoint(point);
+            int result = memberService.modifyMemberPoint(point);
             if(result == 0){
                 return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_MEMBER_NOT_SAVE", false);
             } else {
@@ -270,6 +275,72 @@ public class AdminController {
         } catch (Exception e){
             logger.error(e.getLocalizedMessage());
             return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_FAIL", false);
+        }
+    }
+
+    @RequestMapping(value="/point/list", method= RequestMethod.POST)
+    public ResponseOverlays listPoint(@Validated @RequestBody SEARCH search) {
+        try {
+            search.calStart();
+            List<POINT> list = pointService.listForAdmin(search);
+
+            if(list != null){
+                Integer cnt = pointService.listCnt(search);
+                VoList<POINT> result = new VoList<>(cnt, list);
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_POINT_SUCCESS", result);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_POINT_NULL", null);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_POINT_FAIL", null);
+        }
+    }
+
+    @RequestMapping(value="/point/list/cnt", method= RequestMethod.POST)
+    public ResponseOverlays listPointCnt(@Validated @RequestBody SEARCH search) {
+        try {
+            Map<String, Integer> result = pointService.listCntForAdmin(search);
+
+            if(result != null){
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_POINT_SUCCESS", result);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_POINT_NULL", null);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_POINT_FAIL", null);
+        }
+    }
+
+    @RequestMapping(value="/point/{key}", method= RequestMethod.PUT)
+    public ResponseOverlays modifyPoint(@PathVariable("key") int key, @Validated @RequestBody POINT point) {
+        try {
+            point.setMember_point(key);
+            int result = pointService.modify(point);
+            if(result == 0){
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_POINT_NOT_SAVE", false);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_POINT_SUCCESS", true);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_POINT_FAIL", false);
+        }
+    }
+
+    @RequestMapping(value="/point/all", method= RequestMethod.PUT)
+    public ResponseOverlays modifyPointAll(@Validated @RequestBody SEARCH search) {
+        try {
+            int result = pointService.modifyAll(search);
+            if(result == 0){
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_POINT_NOT_SAVE", false);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_POINT_SUCCESS", true);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_POINT_FAIL", false);
         }
     }
 }

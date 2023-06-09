@@ -31,6 +31,8 @@ public class BasicService {
     @Autowired
     AdminDao adminDao;
     @Autowired
+    PointDao pointDao;
+    @Autowired
     JavaMailSender javaMailSender;
 
     public DASH getDashInfo(SEARCH search) {

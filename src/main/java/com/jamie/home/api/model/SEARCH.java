@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @ToString
 @Getter
 @Setter
@@ -36,6 +38,7 @@ public class SEARCH {
 
     // 관리자
     private Boolean showYn;
+    private List<POINT> chkPointList;
 
     public void calStart(){
         this.start = (this.page-1) * this.page_block;

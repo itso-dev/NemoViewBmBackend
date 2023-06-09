@@ -189,4 +189,20 @@ public class MemberController {
             return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_MEMBER_FAIL", false);
         }
     }
+
+    @RequestMapping(value="/{key}/point", method= RequestMethod.PUT)
+    public ResponseOverlays modifyMemberPoint(@PathVariable("key") int key, @Validated @RequestBody POINT point) {
+        try {
+            point.setMember(key);
+            int result = memberService.modifyMemberPoint(point);
+            if(result == 0){
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_MEMBER_NOT_SAVE", false);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_MEMBER_SUCCESS", true);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_MEMBER_FAIL", false);
+        }
+    }
 }
