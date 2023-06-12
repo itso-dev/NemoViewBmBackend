@@ -49,7 +49,7 @@
     </select>
 
     <select id="getMemberPoint" resultType="java.lang.Integer">
-        SELECT SUM(POINT) FROM BM_MEMBER_POINT WHERE TYPE != 5 AND MEMBER = #{member}
+        SELECT IFNULL(SUM(POINT),0) FROM BM_MEMBER_POINT WHERE TYPE != 5 AND MEMBER = #{member}
     </select>
 
     <insert id="insertMember" parameterType="com.jamie.home.api.model.MEMBER" useGeneratedKeys="true" keyProperty="member">
