@@ -51,6 +51,7 @@
             CATEGORY AS `KEY`, COUNT(CATEGORY) AS CNT
         FROM BM_AD
         WHERE 1=1
+            AND STATE = 2
             AND TYPE = #{type}
         GROUP BY CATEGORY
         ORDER BY COUNT(CATEGORY) DESC
