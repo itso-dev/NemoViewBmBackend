@@ -286,4 +286,46 @@
     <select id="getTodayLeftDayPrice" resultType="java.lang.Integer">
         SELECT CAL_TODAY_LEFT_PRICE(AD) FROM BM_AD WHERE AD = #{ad}
     </select>
+
+    <select id="getCntMemberMatchKeyword" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT G.MEMBER)
+        FROM
+        (
+            -- 성별 키워드 일치 회원
+            SELECT MEMBER FROM MEMBER WHERE 1=1 AND STATE = 1
+            AND GENDER IN (
+                SELECT CK.NAME
+                FROM BM_AD_COMMON_KEYWORD BACK
+                    LEFT JOIN COMMON_KEYWORD CK on BACK.COMMON_KEYWORD = CK.COMMON_KEYWORD
+                WHERE BACK.AD = #{ad} AND CK.CATEGORY = -1
+            )
+            UNION
+            -- 나이 일치 회원
+            SELECT MEMBER FROM MEMBER WHERE 1=1 AND STATE = 1
+            AND GET_VALUE_BIRTHDAY(MEMBER) IN (
+                SELECT CK.NAME
+                FROM BM_AD_COMMON_KEYWORD BACK
+                    LEFT JOIN COMMON_KEYWORD CK on BACK.COMMON_KEYWORD = CK.COMMON_KEYWORD
+                WHERE BACK.AD = #{ad} AND CK.CATEGORY = -2
+            )
+            UNION
+            -- 공통키워드 일치 회원
+            SELECT MEMBER FROM MEMBER WHERE 1=1 AND STATE = 1
+            AND MEMBER IN (
+                SELECT DISTINCT MCK.MEMBER
+                FROM BM_AD_COMMON_KEYWORD BACK
+                    LEFT JOIN MEMBER_COMMON_KEYWORD MCK on BACK.COMMON_KEYWORD = MCK.COMMON_KEYWORD
+                WHERE BACK.AD = #{ad}
+            )
+            UNION
+            -- 필수키워드 일치 회원
+            SELECT MEMBER FROM MEMBER WHERE 1=1 AND STATE = 1
+            AND MEMBER IN (
+                SELECT DISTINCT MK.MEMBER
+                FROM BM_AD_KEYWORD BAK
+                    LEFT JOIN MEMBER_KEYWORD MK on BAK.KEYWORD = MK.KEYWORD
+                WHERE BAK.AD = #{ad}
+            )
+        ) G
+    </select>
 </mapper>

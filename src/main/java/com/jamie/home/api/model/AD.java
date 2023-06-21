@@ -50,4 +50,5 @@ public class AD {
     private Boolean isOver;
     private Integer left_price;
     private MEMBER member_info;
+    private Integer match_cnt;
 }

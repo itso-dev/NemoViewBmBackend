@@ -41,4 +41,5 @@ public interface AdDao {
     Boolean getIsNotOverTodayPrice(AD ad);
 
     Integer getTodayLeftDayPrice(AD ad);
+    Integer getCntMemberMatchKeyword(AD ad);
 }

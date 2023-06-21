@@ -298,4 +298,8 @@ public class AdService extends BasicService {
         }
         return list;
     }
+
+    public Integer getCntMemberMatchKeyword(AD ad){
+        return adDao.getCntMemberMatchKeyword(ad);
+    }
 }

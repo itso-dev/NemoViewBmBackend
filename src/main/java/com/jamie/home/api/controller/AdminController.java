@@ -343,4 +343,21 @@ public class AdminController {
             return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_POINT_FAIL", false);
         }
     }
+
+    @RequestMapping(value="/ad/{key}/cnt/match", method= RequestMethod.GET)
+    public ResponseOverlays getCntMember(@PathVariable("key") int key) {
+        try {
+            AD ad = new AD();
+            ad.setAd(key);
+            Integer result = adService.getCntMemberMatchKeyword(ad);
+            if(result != null){
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_AD_SUCCESS", result);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_NULL", false);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_FAIL", false);
+        }
+    }
 }
