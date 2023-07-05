@@ -50,6 +50,7 @@
                     <when test="searchType == 'new'.toString()"></when>
                     <when test="searchType == 'match_keyword_list'.toString()">
                         AND COUNT_MATCH_KEYWORD_BM_AD(AD, #{user_member}) != 0
+                        AND COUNT_MATCH_MANDATORY_KEYWORD_BM_AD(AD, #{user_member})
                     </when>
                     <when test="searchType == 'discount_list'.toString()">
                         AND DISCOUNT != 0
