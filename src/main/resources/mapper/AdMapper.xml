@@ -32,6 +32,18 @@
                     MEMBER IN (SELECT MEMBER FROM BM_MEMBER WHERE COMPANY LIKE CONCAT('%',#{searchKeyword},'%'))
                 )
             </if>
+            <if test="searchType == 'product_brand'.toString()">
+                AND TYPE = 1
+                AND BRAND LIKE CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchType == 'product_name'.toString()">
+                AND TYPE = 1
+                AND AD BRAND CONCAT('%',#{searchKeyword},'%')
+            </if>
+            <if test="searchType == 'service_name'.toString()">
+                AND TYPE = 2
+                AND AD BRAND CONCAT('%',#{searchKeyword},'%')
+            </if>
             <if test="searchType == null">
                 AND (
                     MATCH(TITLE) AGAINST (CONCAT(#{searchKeyword},'*') IN BOOLEAN MODE)
