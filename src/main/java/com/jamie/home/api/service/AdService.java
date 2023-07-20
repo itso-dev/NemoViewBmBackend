@@ -4,6 +4,7 @@ import com.jamie.home.api.model.*;
 import com.jamie.home.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -301,5 +302,66 @@ public class AdService extends BasicService {
 
     public Integer getCntMemberMatchKeyword(AD ad){
         return adDao.getCntMemberMatchKeyword(ad);
+    }
+
+    public Integer getCntMemberChange(SEARCH search) {
+        long common_mandatory = 0;
+        long keyword_mandatory = 0;
+
+        if(search.getCommonKeywordList().size() == 0 && search.getKeywordList().size() == 0){
+            return 0;
+        }
+        if(search.getCommonKeywordList().size() == 0){
+            search.setCommonKeywordList(null);
+        }
+        if(search.getKeywordList().size() == 0){
+            search.setKeywordList(null);
+        }
+
+        if(search.getCommonKeywordList() != null){
+            common_mandatory = search.getCommonKeywordList().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).count();
+            search.setCommonKeywordList_gender(search.getCommonKeywordList().stream().filter(i -> i.getCategory() == -1).collect(Collectors.toList()));
+            search.setCommonKeywordList_gender_mandatory(search.getCommonKeywordList_gender().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).count());
+            if(search.getCommonKeywordList_gender().size() == 0){
+                search.setCommonKeywordList_gender(null);
+            }
+
+            search.setCommonKeywordList_age(search.getCommonKeywordList().stream().filter(i -> i.getCategory() == -2).collect(Collectors.toList()));
+            search.setCommonKeywordList_age_mandatory(search.getCommonKeywordList_age().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).count());
+            if(search.getCommonKeywordList_age().size() == 0){
+                search.setCommonKeywordList_age(null);
+            }
+
+            search.setCommonKeywordList(search.getCommonKeywordList().stream().filter(i -> i.getCategory() >= 0).collect(Collectors.toList()));
+            search.setCommonKeywordList_mandatory(search.getCommonKeywordList().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).count());
+            if(search.getCommonKeywordList().size() == 0){
+                search.setCommonKeywordList(null);
+            }
+        }
+
+        if(search.getKeywordList() != null){
+            keyword_mandatory = search.getKeywordList().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).count();
+            search.setKeywordList_mandatory(search.getKeywordList().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).count());
+            if(search.getKeywordList().size() == 0){
+                search.setKeywordList(null);
+            }
+        }
+
+        if((common_mandatory + keyword_mandatory) == 0){ // 필수 키워드 없는
+            return adDao.getCntMemberMatchKeywordChange(search);
+        } else {
+            search.setCommonKeywordList_gender(search.getCommonKeywordList_gender().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
+            search.setCommonKeywordList_age(search.getCommonKeywordList_age().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
+            search.setCommonKeywordList(search.getCommonKeywordList().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
+            if(search.getCommonKeywordList().size() == 0){
+                search.setCommonKeywordList(null);
+            }
+            search.setKeywordList(search.getKeywordList().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
+            if(search.getKeywordList().size() == 0){
+                search.setKeywordList(null);
+            }
+
+            return adDao.getCntMemberMatchKeywordChangeWithMandatory(search);
+        }
     }
 }

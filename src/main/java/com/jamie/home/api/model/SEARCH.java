@@ -30,6 +30,14 @@ public class SEARCH {
     private String start_date;
     private String end_date;
     private Integer state;
+    private List<KEYWORD> commonKeywordList; // 공통
+    private List<KEYWORD> commonKeywordList_gender; // 공통
+    private List<KEYWORD> commonKeywordList_age; // 공통
+    private List<KEYWORD> keywordList; // 필수
+    private long commonKeywordList_mandatory;
+    private long commonKeywordList_gender_mandatory;
+    private long commonKeywordList_age_mandatory;
+    private long keywordList_mandatory;
 
     // 사용자
     private Integer user_member;

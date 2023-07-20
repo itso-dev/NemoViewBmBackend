@@ -42,4 +42,8 @@ public interface AdDao {
 
     Integer getTodayLeftDayPrice(AD ad);
     Integer getCntMemberMatchKeyword(AD ad);
+
+    Integer getCntMemberMatchKeywordChange(SEARCH search);
+
+    Integer getCntMemberMatchKeywordChangeWithMandatory(SEARCH search);
 }

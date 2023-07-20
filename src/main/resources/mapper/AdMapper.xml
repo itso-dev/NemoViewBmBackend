@@ -49,8 +49,9 @@
             </if>
             <if test="searchType == null">
                 AND (
-                    MATCH(TITLE) AGAINST (CONCAT(#{searchKeyword},'*') IN BOOLEAN MODE)
-                    OR MATCH(BRAND) AGAINST (CONCAT(#{searchKeyword},'*') IN BOOLEAN MODE)
+                    MATCH(BRAND) AGAINST (CONCAT(#{searchKeyword},'*') IN BOOLEAN MODE)
+                    OR MATCH(NAME) AGAINST (CONCAT(#{searchKeyword},'*') IN BOOLEAN MODE)
+                    OR MATCH(KEYWORDS) AGAINST (CONCAT(#{searchKeyword},'*') IN BOOLEAN MODE)
                 )
             </if>
         </if>
@@ -342,6 +343,116 @@
                     LEFT JOIN MEMBER_KEYWORD MK on BAK.KEYWORD = MK.KEYWORD
                 WHERE BAK.AD = #{ad}
             )
+        ) G
+    </select>
+    <select id="getCntMemberMatchKeywordChange" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT G.MEMBER)
+        FROM
+        (
+        <if test="commonKeywordList_gender != null">
+            -- 성별 키워드 일치 회원
+            SELECT MEMBER FROM MEMBER WHERE 1=1 AND STATE = 1
+            AND
+            <foreach collection="commonKeywordList_gender" item="keyword" open="(" separator="OR" close=")">
+                GENDER = (SELECT NAME FROM COMMON_KEYWORD WHERE COMMON_KEYWORD = #{keyword.common_keyword})
+            </foreach>
+            <if test="commonKeywordList_age != null or commonKeywordList != null or keywordList != null">
+                UNION
+            </if>
+        </if>
+        <if test="commonKeywordList_age != null">
+            -- 나이 일치 회원
+            SELECT MEMBER FROM MEMBER WHERE 1=1 AND STATE = 1
+            AND
+            <foreach collection="commonKeywordList_age" item="keyword" open="(" separator="OR" close=")">
+                GET_VALUE_BIRTHDAY(MEMBER) = (SELECT NAME FROM COMMON_KEYWORD WHERE COMMON_KEYWORD = #{keyword.common_keyword})
+            </foreach>
+            <if test="commonKeywordList != null or keywordList != null">
+                UNION
+            </if>
+        </if>
+        <if test="commonKeywordList != null">
+            -- 공통키워드 일치 회원
+            SELECT MEMBER FROM MEMBER WHERE 1=1 AND STATE = 1
+            AND MEMBER IN
+            (
+                SELECT MEMBER
+                FROM MEMBER_COMMON_KEYWORD
+                WHERE COMMON_KEYWORD IN
+                <foreach collection="commonKeywordList" item="keyword" open="(" separator="," close=")">
+                    #{keyword.common_keyword}
+                </foreach>
+                GROUP BY MEMBER
+            )
+            <if test="keywordList != null">
+                UNION
+            </if>
+        </if>
+        <if test="keywordList != null">
+            -- 필수키워드 일치 회원
+            SELECT MEMBER FROM MEMBER WHERE 1=1 AND STATE = 1
+            AND MEMBER IN
+            (
+                SELECT MEMBER
+                FROM MEMBER_KEYWORD
+                WHERE KEYWORD IN
+                <foreach collection="keywordList" item="keyword" open="(" separator="," close=")">
+                    #{keyword.keyword}
+                </foreach>
+                GROUP BY MEMBER
+            )
+        </if>
+        ) G
+    </select>
+    <select id="getCntMemberMatchKeywordChangeWithMandatory" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT G.MEMBER)
+        FROM
+        (
+            SELECT MEMBER FROM MEMBER WHERE 1=1 AND STATE = 1
+        <if test="commonKeywordList_gender != null and commonKeywordList_gender_mandatory != 0">
+            -- 성별 키워드 일치 회원
+            <foreach collection="commonKeywordList_gender" item="keyword" separator="">
+                <if test="keyword.mandatory">
+                    AND GENDER = (SELECT NAME FROM COMMON_KEYWORD WHERE COMMON_KEYWORD = #{keyword.common_keyword})
+                </if>
+            </foreach>
+        </if>
+        <if test="commonKeywordList_age != null and commonKeywordList_age_mandatory != 0">
+            -- 나이 일치 회원
+            <foreach collection="commonKeywordList_age" item="keyword" separator="">
+                <if test="keyword.mandatory">
+                    AND GET_VALUE_BIRTHDAY(MEMBER) = (SELECT NAME FROM COMMON_KEYWORD WHERE COMMON_KEYWORD = #{keyword.common_keyword})
+                </if>
+            </foreach>
+        </if>
+        <if test="commonKeywordList != null">
+            -- 공통키워드 일치 회원
+            AND MEMBER IN
+            (
+                SELECT MEMBER
+                FROM MEMBER_COMMON_KEYWORD
+                WHERE COMMON_KEYWORD IN
+                <foreach collection="commonKeywordList" item="keyword" open="(" separator="," close=")">
+                    #{keyword.common_keyword}
+                </foreach>
+                GROUP BY MEMBER
+                HAVING COUNT(MEMBER) = #{commonKeywordList_mandatory}
+            )
+        </if>
+        <if test="keywordList != null">
+            -- 필수키워드 일치 회원
+            AND MEMBER IN
+            (
+                SELECT MEMBER
+                FROM MEMBER_KEYWORD
+                WHERE KEYWORD IN
+                <foreach collection="keywordList" item="keyword" open="(" separator="," close=")">
+                    #{keyword.keyword}
+                </foreach>
+                GROUP BY MEMBER
+                HAVING COUNT(MEMBER) = #{keywordList_mandatory}
+            )
+        </if>
         ) G
     </select>
 </mapper>
