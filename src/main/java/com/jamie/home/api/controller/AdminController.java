@@ -360,4 +360,18 @@ public class AdminController {
             return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_FAIL", false);
         }
     }
-}
+
+    @RequestMapping(value="/ad/member/cnt/match", method= RequestMethod.POST)
+    public ResponseOverlays getCntMemberChange(@Validated @RequestBody SEARCH search) {
+        try {
+            Integer result = adService.getCntMemberChange(search);
+            if(result != null){
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "GET_AD_SUCCESS", result);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_NULL", false);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "GET_AD_FAIL", false);
+        }
+    }}
