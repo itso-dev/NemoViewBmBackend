@@ -350,15 +350,23 @@ public class AdService extends BasicService {
         if((common_mandatory + keyword_mandatory) == 0){ // 필수 키워드 없는
             return adDao.getCntMemberMatchKeywordChange(search);
         } else {
-            search.setCommonKeywordList_gender(search.getCommonKeywordList_gender().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
-            search.setCommonKeywordList_age(search.getCommonKeywordList_age().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
-            search.setCommonKeywordList(search.getCommonKeywordList().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
-            if(search.getCommonKeywordList().size() == 0){
-                search.setCommonKeywordList(null);
+            if(search.getCommonKeywordList_gender() != null){
+                search.setCommonKeywordList_gender(search.getCommonKeywordList_gender().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
             }
-            search.setKeywordList(search.getKeywordList().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
-            if(search.getKeywordList().size() == 0){
-                search.setKeywordList(null);
+            if(search.getCommonKeywordList_age() != null){
+                search.setCommonKeywordList_age(search.getCommonKeywordList_age().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
+            }
+            if(search.getCommonKeywordList() != null){
+                search.setCommonKeywordList(search.getCommonKeywordList().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
+                if(search.getCommonKeywordList().size() == 0){
+                    search.setCommonKeywordList(null);
+                }
+            }
+            if(search.getKeywordList() != null){
+                search.setKeywordList(search.getKeywordList().stream().filter(i -> i.getMandatory() != null && i.getMandatory()).collect(Collectors.toList()));
+                if(search.getKeywordList().size() == 0){
+                    search.setKeywordList(null);
+                }
             }
 
             return adDao.getCntMemberMatchKeywordChangeWithMandatory(search);
