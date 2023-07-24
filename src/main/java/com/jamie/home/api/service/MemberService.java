@@ -49,6 +49,7 @@ public class MemberService extends BasicService{
         member.setPoint(memberDao.getMemberPoint(member));
         SEARCH search = new SEARCH();
         search.setMember(member.getMember());
+        search.setChk(false);
         member.setInfoList(infoDao.getListInfo(search));
     }
 
@@ -101,7 +102,7 @@ public class MemberService extends BasicService{
         point.setAccumulate(member_point + point.getPoint());
         if(point.getType() == 2){ // 충전
             // 알림 TYPE 6
-            INFO info = new INFO(point.getMember(),"포인트 "+point.getPoint()+"P 충전되셨습니다.");
+            INFO info = new INFO(point.getMember(),2,null,"포인트 "+point.getPoint()+"P 충전되셨습니다.");
             infoDao.insertInfo(info);
         } else if(point.getType() == 3){ // 환불 요청
             if(member_point < point.getPoint()*(-1)){

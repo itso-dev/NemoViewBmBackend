@@ -10,6 +10,9 @@
         <if test="member != null">
             AND MEMBER = #{member}
         </if>
+        <if test="chk != null">
+            AND CHK = #{chk}
+        </if>
     </sql>
     <sql id="ListOrder">
         ORDER BY

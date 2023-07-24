@@ -1,9 +1,7 @@
 package com.jamie.home.api.controller;
 
-import com.jamie.home.api.model.MEMBER;
-import com.jamie.home.api.model.POINT;
-import com.jamie.home.api.model.ResponseOverlays;
-import com.jamie.home.api.model.TOKEN;
+import com.jamie.home.api.model.*;
+import com.jamie.home.api.service.InfoService;
 import com.jamie.home.api.service.MailService;
 import com.jamie.home.api.service.MemberService;
 import com.jamie.home.jwt.JwtFilter;
@@ -49,6 +47,8 @@ public class MemberController {
     @Autowired
     private MailService mailService;
 
+    @Autowired
+    private InfoService infoService;
 
     @RequestMapping(value="/{key}", method= RequestMethod.GET)
     public ResponseOverlays get(@PathVariable("key") int key) {
@@ -203,6 +203,22 @@ public class MemberController {
         } catch (Exception e){
             logger.error(e.getLocalizedMessage());
             return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_MEMBER_FAIL", false);
+        }
+    }
+
+    @RequestMapping(value={"/info/{key}"}, method= RequestMethod.PUT)
+    public ResponseOverlays modifyInfoChk(@PathVariable("key") int key, INFO info) {
+        try {
+            info.setMember_info(key);
+            int result = infoService.modifyChk(info);
+            if(result == 0){
+                return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_HIT_NOT_SAVE", false);
+            } else {
+                return new ResponseOverlays(HttpServletResponse.SC_OK, "SAVE_HIT_SUCCESS", true);
+            }
+        } catch (Exception e){
+            logger.error(e.getLocalizedMessage());
+            return new ResponseOverlays(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "SAVE_HIT_FAIL", false);
         }
     }
 }

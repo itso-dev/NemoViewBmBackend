@@ -184,11 +184,11 @@ public class AdService extends BasicService {
         // 0: 임시저장(광고셋팅중), 1: 저장완료(검수중), 2: 검수완료(진행중), 3: 광고중지 (STATE_ERROR 수정), 4: 광고반려
         if(ori_ad.getState() == 0 && ad.getState() == 1){
             // 알림 TYPE 1
-            INFO info = new INFO(ori_ad.getMember(),ori_ad.getTitle()+" 광고가 검수 작업에 들어갔습니다.");
+            INFO info = new INFO(ori_ad.getMember(), 1, ori_ad.getAd(), ori_ad.getTitle()+" 광고가 검수 작업에 들어갔습니다.");
             infoDao.insertInfo(info);
         } else if(ori_ad.getState() == 1 && ad.getState() == 2){
             // 알림 TYPE 2
-            INFO info = new INFO(ori_ad.getMember(),ori_ad.getTitle()+" 광고가 검수 완료하였습니다.");
+            INFO info = new INFO(ori_ad.getMember(), 1, ori_ad.getAd(), ori_ad.getTitle()+" 광고가 검수 완료하였습니다.");
             infoDao.insertInfo(info);
             MEMBER member = new MEMBER();
             member.setMember(ori_ad.getMember());
@@ -198,15 +198,15 @@ public class AdService extends BasicService {
             }
         } else if(ori_ad.getState() == 1 && ad.getState() == 4){
             // 알림 TYPE 5
-            INFO info = new INFO(ori_ad.getMember(),ori_ad.getTitle()+" 광고가 반려되었습니다.");
+            INFO info = new INFO(ori_ad.getMember(), 1, ori_ad.getAd(), ori_ad.getTitle()+" 광고가 반려되었습니다.");
             infoDao.insertInfo(info);
         } else if(ori_ad.getState() == 2 && ad.getState() == 3){ // 광고 중지
             // 알림 TYPE 3
-            INFO info = new INFO(ori_ad.getMember(),ori_ad.getTitle()+" 광고가 중지 되었습니다.\n재개를 원하실 경우 광고 페이지에서 재설정해주세요!");
+            INFO info = new INFO(ori_ad.getMember(), 1, ori_ad.getAd(), ori_ad.getTitle()+" 광고가 중지 되었습니다.\n재개를 원하실 경우 광고 페이지에서 재설정해주세요!");
             infoDao.insertInfo(info);
         } else if(ori_ad.getState() == 3 && ad.getState() == 2){ // 광고 재개
             // 알림 TYPE 4
-            INFO info = new INFO(ori_ad.getMember(),ori_ad.getTitle()+" 광고가 다시 게시되었습니다.");
+            INFO info = new INFO(ori_ad.getMember(), 1, ori_ad.getAd(), ori_ad.getTitle()+" 광고가 다시 게시되었습니다.");
             infoDao.insertInfo(info);
         }
         return adDao.updateAd(ad);
@@ -270,11 +270,11 @@ public class AdService extends BasicService {
 
         } else if(re_member_point <= 0){
             // 알림 TYPE 7
-            INFO info = new INFO(ad_member.getMember(),"포인트가 모두 소진되었습니다.");
+            INFO info = new INFO(ad_member.getMember(), 2, null, "포인트가 모두 소진되었습니다.");
             infoDao.insertInfo(info);
         } else if(re_member_point <= 1000){
             // 알림 TYPE 8
-            INFO info = new INFO(ad_member.getMember(),"포인트가 1,000P 이하입니다.");
+            INFO info = new INFO(ad_member.getMember(), 2, null, "포인트가 1,000P 이하입니다.");
             infoDao.insertInfo(info);
         }
 

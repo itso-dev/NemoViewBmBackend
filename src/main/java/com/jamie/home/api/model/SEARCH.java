@@ -21,6 +21,7 @@ public class SEARCH {
     // 회원
     private Integer member;
     private String email;
+    private Boolean chk;
 
     // 광고
     private Integer ad;

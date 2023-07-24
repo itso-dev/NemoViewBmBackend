@@ -29,4 +29,8 @@ public class InfoService extends BasicService{
     public Integer modify(INFO info) {
         return infoDao.updateInfo(info);
     }
+
+    public Integer modifyChk(INFO info) {
+        return infoDao.updateInfoChk(info);
+    }
 }
