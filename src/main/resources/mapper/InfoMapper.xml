@@ -43,9 +43,9 @@
 
     <insert id="insertInfo" parameterType="com.jamie.home.api.model.INFO" useGeneratedKeys="true" keyProperty="member_info">
         INSERT INTO BM_MEMBER_INFO (
-            MEMBER, CONTENT
+            MEMBER, TYPE, `KEY`, CONTENT
         ) VALUES (
-            #{member}, #{content}
+            #{member}, #{type}, #{key}, #{content}
         )
     </insert>
 
