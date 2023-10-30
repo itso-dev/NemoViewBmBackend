@@ -455,4 +455,12 @@
         </if>
         ) G
     </select>
+
+    <select id="getMemberAdOpen" resultType="java.lang.Boolean">
+        SELECT OPEN
+        FROM MEMBER_AD
+        WHERE AD = #{ad} AND MEMBER = #{member}
+            AND REGDATE >= DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')
+            AND DATE_FORMAT(NOW(), '%Y-%m-%d 23:59:59') >= REGDATE
+    </select>
 </mapper>

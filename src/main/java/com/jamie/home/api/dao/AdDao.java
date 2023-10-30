@@ -46,4 +46,6 @@ public interface AdDao {
     Integer getCntMemberMatchKeywordChange(SEARCH search);
 
     Integer getCntMemberMatchKeywordChangeWithMandatory(SEARCH search);
+
+    Boolean getMemberAdOpen(AD param);
 }

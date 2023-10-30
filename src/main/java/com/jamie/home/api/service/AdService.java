@@ -296,6 +296,7 @@ public class AdService extends BasicService {
             } else {
                 list.get(i).setLikeYn(true);
             }
+            list.get(i).setOpen(adDao.getMemberAdOpen(param));
         }
         return list;
     }

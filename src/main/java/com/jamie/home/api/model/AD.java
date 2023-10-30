@@ -32,6 +32,7 @@ public class AD {
     private Integer hits;
     private Integer state;
     private String state_error;
+    private Boolean open;
     private Date regdate;
     private Date upddate;
 
